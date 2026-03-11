@@ -79,7 +79,7 @@ header p {
     justify-content: center; /* Center under the logo */
     align-items: center;
     width: 100%;
-    margin-top: 0.5rem; /* Space below the logo */
+    margin-top: 0.1rem; /* Reduced space below the logo */
     margin-left: calc(0px - 260mm); /* Match logo shift to stay centered under it */
 }
 
