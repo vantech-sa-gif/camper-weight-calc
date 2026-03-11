@@ -338,10 +338,16 @@ try {
             }
         });
 
-        if (style === 'family' && p6) p6.checked = true;
+        if (style === 'family' || style === 'custom') {
+            if (p6) p6.checked = true;
+        }
         if ((style === 'emax' || style === 'wmax') && p4) p4.checked = true;
         if (style === 'premium' && p3) p3.checked = true;
 
+        // Default settings for Custom
+        if (style === 'custom' && optWaterTank) {
+            optWaterTank.checked = true;
+        }
         // Default settings for W-max
         if (style === 'wmax') {
             if (optWaterTank) optWaterTank.checked = true;
