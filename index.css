@@ -1,0 +1,460 @@
+:root {
+    --bg-color: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-blue: #0ea5e9;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-yellow: #f59e0b;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(203, 213, 225, 0.6);
+    --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: clip; /* clip allows position: sticky to work properly */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background gradient effect simplified for performance */
+.background-mesh {
+    position: absolute; /* Changed from fixed to prevent scroll paint loops */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: 
+        radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.03), transparent 25%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center everything in the container */
+    margin-bottom: 2rem;
+    position: relative; /* Setup for absolute positioning of children if needed */
+}
+
+.main-logo {
+    max-width: 308px; /* Increosed by 10% from 280px */
+    height: auto;
+    display: block;
+    margin-left: calc(0px - 10mm); /* Pull it left by 10mm from center or its natural container position */
+    align-self: flex-start; /* Ensures the logo stays on the left */
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+    transition: transform 0.3s ease;
+    mix-blend-mode: multiply;
+}
+
+.main-logo:hover {
+    transform: scale(1.02);
+    transform-origin: left center;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center; /* Centers the version badge */
+    align-items: center;
+    width: 100%; /* Take full width to center properly */
+    margin-top: -1.5rem; /* Pull it up slightly closer to the logo baseline if needed, adjust as want */
+}
+
+.version-badge {
+    font-size: 0.75rem;
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--accent-blue);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.95);
+    /* backdrop-filter removed to prevent Chrome scrolling crash */
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px 0 rgba(0, 0, 0, 0.08);
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.75rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.input-group.half {
+    flex: 1;
+}
+
+label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+}
+
+input[type="number"], select {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.helper-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: -0.5rem;
+    font-style: italic;
+}
+
+/* Summary Section */
+.sticky {
+    position: sticky;
+    top: 2rem;
+}
+
+.summary-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(226, 232, 240, 1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    /* Removed transform properties that break position: sticky */
+}
+
+.summary-card.glass:hover {
+    /* Prevent hover transform from breaking sticky position */
+    transform: none;
+}
+
+.total-display {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.current-weight {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent-green);
+    transition: color 0.3s ease;
+}
+
+.current-weight .unit {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 0.25rem;
+}
+
+.gvwr-target {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-green);
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.1, 0.7, 0.1, 1), background-color 0.3s ease;
+}
+
+.status-message {
+    text-align: center;
+    font-weight: 500;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent-green);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.status-message.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent-yellow);
+}
+
+.status-message.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+}
+
+/* Modifier classes for current weight color */
+.current-weight.warning { color: var(--accent-yellow); }
+.current-weight.danger { color: var(--accent-red); }
+.progress-bar.warning { background: var(--accent-yellow); }
+.progress-bar.danger { background: var(--accent-red); }
+
+.tab-selector {
+    display: flex;
+    background: rgba(226, 232, 240, 0.6);
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--glass-border);
+}
+
+.tab-selector input[type="radio"] {
+    display: none;
+}
+
+.tab-selector label {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.tab-selector label:hover {
+    color: var(--text-primary);
+}
+
+.tab-selector input[type="radio"]:checked + label {
+    background: var(--accent-blue);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.option-item:hover {
+    background: #ffffff;
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.option-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
+}
+
+.option-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-name {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.option-weight {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.axle-summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(241, 245, 249, 0.6);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+.axle-summary h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.axle-stat {
+    margin-bottom: 0.75rem;
+}
+
+.axle-stat:last-child {
+    margin-bottom: 0;
+}
+
+.axle-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.axle-labels .remaining {
+    color: var(--accent-green);
+    font-weight: 600;
+}
+.axle-labels .remaining.warning { color: var(--accent-yellow); }
+.axle-labels .remaining.danger { color: var(--accent-red); }
+
+.progress-bar-container.small {
+    height: 6px;
+    margin-bottom: 0;
+    box-shadow: none;
+}
+
+.breakdown h3 {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    font-size: 0.95rem;
+}
+
+.breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.breakdown-item span:last-child {
+    font-weight: 600;
+}
+
+.option-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(226, 232, 240, 0.5);
+    pointer-events: none;
+    border-color: rgba(203, 213, 225, 0.3);
+}
+
+/* New class for passenger tabs to disable interaction without changing look */
+.tab-selector.locked {
+    pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .sticky {
+        position: static;
+    }
+    
+    .summary-section {
+        order: -1; /* Move summary to top on mobile */
+    }
+}
+
+@media (max-width: 500px) {
+    .input-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

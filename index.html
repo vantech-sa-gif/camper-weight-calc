@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Cal</title>
+    <meta name="description" content="キャンピングカーの総重量と前軸・後軸の重量配分を計算し、許容車両総重量（GVWR）内に収まるか確認します。">
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<body>
+    <div class="background-mesh"></div>
+    <div class="app-container">
+        <header>
+            <img src="logo.png" alt="V-Cal ロゴ" class="main-logo">
+            <p><span class="version-badge">v0.1</span></p>
+        </header>
+
+        <main class="dashboard">
+            <section class="input-section">
+                <!-- Style Select -->
+                <div class="card glass">
+                    <h2><span class="icon">✨</span> スタイル選択</h2>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <div class="tab-selector" id="styleSelector">
+                            <input type="radio" id="style_custom" name="camper_style" value="custom" checked>
+                            <label for="style_custom">フリー</label>
+
+                            <input type="radio" id="style_family" name="camper_style" value="family">
+                            <label for="style_family">Family</label>
+                            
+                            <input type="radio" id="style_wmax" name="camper_style" value="wmax">
+                            <label for="style_wmax">W-max</label>
+                            
+                            <input type="radio" id="style_emax" name="camper_style" value="emax">
+                            <label for="style_emax">E-max</label>
+                            
+                            <input type="radio" id="style_premium" name="camper_style" value="premium">
+                            <label for="style_premium">Premium</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passengers -->
+                <div class="card glass">
+                    <h2><span class="icon">👥</span> 乗車定員</h2>
+                    <div class="input-group">
+                        <label>乗車人数 (1人あたり55kg)</label>
+                        <div class="tab-selector" id="passengerSelector">
+                            <input type="radio" name="passengerCount" id="p3" value="3">
+                            <label for="p3">3人</label>
+                            <input type="radio" name="passengerCount" id="p4" value="4">
+                            <label for="p4">4人</label>
+                            <input type="radio" name="passengerCount" id="p6" value="6" checked>
+                            <label for="p6">6人</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="card glass">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+                        <h2 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"><span class="icon">🛠️</span> オプション</h2>
+                        <button id="clearOptionsBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--accent-red); background: rgba(239, 68, 68, 0.1); color: var(--accent-red); cursor: pointer; transition: all 0.2s;">全選択解除</button>
+                    </div>
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="4" data-rear="19" data-total="23">
+                            <div class="option-content">
+                                <span class="option-name">サイドオーニング3.5m (O1026)</span>
+                                <span class="option-weight">+23kg (F: 4, R: 19)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O1404" data-front="5" data-rear="0" data-total="5">
+                            <div class="option-content">
+                                <span class="option-name">ルーフウィンドウ (O1404)</span>
+                                <span class="option-weight">+5kg (F: 5, R: 0)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="7" data-total="5">
+                            <div class="option-content">
+                                <span class="option-name">エントランスアシストステップ (O1043)</span>
+                                <span class="option-weight">+5kg (F: -2, R: 7)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="-3" data-rear="13" data-total="10">
+                            <div class="option-content">
+                                <span class="option-name">ラップル (P3202)</span>
+                                <span class="option-weight">+10kg (F: -3, R: 13)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O3012" data-front="-3" data-rear="33" data-total="30">
+                            <div class="option-content">
+                                <span class="option-name">温水設備 (O3012)</span>
+                                <span class="option-weight">+30kg (F: -3, R: 33)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="-3" data-rear="28" data-total="25">
+                            <div class="option-content">
+                                <span class="option-name">電気冷蔵庫83L (O4501)</span>
+                                <span class="option-weight">+25kg (F: -3, R: 28)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="15.5" data-total="13.5">
+                            <div class="option-content">
+                                <span class="option-name">電子レンジ (O4052)</span>
+                                <span class="option-weight">+13.5kg (F: -2, R: 15.5)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O4800" data-front="20" data-rear="10" data-total="30">
+                            <div class="option-content">
+                                <span class="option-name">リチウムイオンバッテリー追加(1個) (O4800)</span>
+                                <span class="option-weight">+30kg (F: 20, R: 10)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O4801" data-front="40" data-rear="20" data-total="60">
+                            <div class="option-content">
+                                <span class="option-name">リチウムイオンバッテリー追加(2個) (O4801)</span>
+                                <span class="option-weight">+60kg (F: 40, R: 20)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O4601" data-front="9" data-rear="1" data-total="10">
+                            <div class="option-content">
+                                <span class="option-name">フレキシブルソーラー充電器 (240W) (O4601)</span>
+                                <span class="option-weight">+10kg (F: 9, R: 1)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_O4600" data-front="14" data-rear="1" data-total="15">
+                            <div class="option-content">
+                                <span class="option-name">フレキシブルソーラー充電器 (480W) (O4600)</span>
+                                <span class="option-weight">+15kg (F: 14, R: 1)</span>
+                            </div>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="17" data-total="15">
+                            <div class="option-content">
+                                <span class="option-name">フレキシブルソーラー充電器 (610W) (O4700)</span>
+                                <span class="option-weight">+15kg (F: -2, R: 17)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Fluids & Water -->
+                <div class="card glass">
+                    <h2><span class="icon">💧</span> 水タンク</h2>
+                    <div class="options-grid" style="margin-bottom: 1.5rem;">
+                        <label class="option-item">
+                            <input type="checkbox" class="option-checkbox" id="opt_WaterTank" data-front="7" data-rear="48" data-total="55" checked>
+                            <div class="option-content">
+                                <span class="option-name">生活用水タンク</span>
+                                <span class="option-weight">+55kg (F: 7, R: 48)</span>
+                            </div>
+                        </label>
+
+                        <label class="option-item disabled">
+                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="22" data-total="20" checked disabled>
+                            <div class="option-content">
+                                <span class="option-name">清水タンク</span>
+                                <span class="option-weight">+20kg (F: -2, R: 22)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Vehicle Settings -->
+                <div class="card glass">
+                    <h2><span class="icon">🚐</span> 車両基本情報</h2>
+                    <div class="input-row">
+                        <div class="input-group half">
+                            <label for="baseFrontWeight" title="前軸重">ベース車 前軸重 (kg)</label>
+                            <input type="number" id="baseFrontWeight" value="1515" min="0" step="5" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                        </div>
+                        <div class="input-group half">
+                            <label for="baseRearWeight" title="後軸重">ベース車 後軸重 (kg)</label>
+                            <input type="number" id="baseRearWeight" value="1525" min="0" step="5" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group half">
+                            <label for="frontGawr">前軸許容荷重 (kg)</label>
+                            <input type="number" id="frontGawr" value="1900" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                        </div>
+                        <div class="input-group half">
+                            <label for="rearGawr">後軸許容荷重 (kg)</label>
+                            <input type="number" id="rearGawr" value="2300" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="gvwr">許容車両総重量・GVWR (kg)</label>
+                        <input type="number" id="gvwr" value="3490" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="summary-section sticky" style="align-self: start; top: 2rem;">
+                <div class="summary-card glass">
+                    <h2>車両総重量</h2>
+                    
+                    <div class="total-display">
+                        <div class="current-weight">
+                            <span id="totalWeightDisplay">3198</span><span class="unit">kg</span>
+                        </div>
+                        <div class="gvwr-target">
+                            / 最大許容 <span id="gvwrDisplay">3500</span> kg
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="weightProgressBar"></div>
+                    </div>
+                    
+                    <div class="status-message" id="statusMessage">
+                        安全圏です！あと 302kg の余裕があります。
+                    </div>
+
+                    <div class="axle-summary">
+                        <h3>軸重リミット</h3>
+                        <div class="axle-stat">
+                            <div class="axle-labels">
+                                <span>前軸 (<span id="frontWeightRaw">1200</span> / <span id="frontGawrDisplay">1600</span> kg)</span>
+                                <span id="frontRemaining" class="remaining">残り 400 kg</span>
+                            </div>
+                            <div class="progress-bar-container small">
+                                <div class="progress-bar" id="frontProgressBar"></div>
+                            </div>
+                        </div>
+                        <div class="axle-stat">
+                            <div class="axle-labels">
+                                <span>後軸 (<span id="rearWeightRaw">1300</span> / <span id="rearGawrDisplay">2000</span> kg)</span>
+                                <span id="rearRemaining" class="remaining">残り 700 kg</span>
+                            </div>
+                            <div class="progress-bar-container small">
+                                <div class="progress-bar" id="rearProgressBar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown">
+                        <h3>内訳</h3>
+                        <div class="breakdown-item">
+                            <span>標準装備重量</span>
+                            <span id="breakdownBase">2500 kg</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>乗車定員</span>
+                            <span id="breakdownPassengers">150 kg</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>水タンク</span>
+                            <span id="breakdownWater">0 kg</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>オプション</span>
+                            <span id="breakdownOptions">0 kg</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
