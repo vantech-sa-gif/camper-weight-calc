@@ -62,7 +62,6 @@ header {
     height: auto;
     display: block;
     margin-left: calc(0px - 30mm); /* Moved further left by 20mm (total 30mm) */
-    align-self: flex-start; /* Ensures the logo stays on the left */
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
     transition: transform 0.3s ease;
     mix-blend-mode: multiply;
@@ -77,11 +76,11 @@ header p {
     color: var(--text-secondary);
     font-size: 1.1rem;
     display: flex;
-    justify-content: flex-start; /* Align under the logo */
+    justify-content: center; /* Center under the logo */
     align-items: center;
     width: 100%;
     margin-top: 0.5rem; /* Space below the logo */
-    padding-left: 2rem; /* Add some padding to align better with the shifted logo */
+    margin-left: calc(0px - 30mm); /* Match logo shift to stay centered under it */
 }
 
 .version-badge {
