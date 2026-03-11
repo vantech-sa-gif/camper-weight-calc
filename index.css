@@ -77,16 +77,15 @@ header p {
     color: var(--text-secondary);
     font-size: 1.1rem;
     display: flex;
-    justify-content: flex-start; /* Aligned to left */
+    justify-content: flex-start; /* Align under the logo */
     align-items: center;
     width: 100%;
-    margin-top: 0.5rem; /* Reset margin since it's no longer centered below logo */
+    margin-top: 0.5rem; /* Space below the logo */
+    padding-left: 2rem; /* Add some padding to align better with the shifted logo */
 }
 
 .version-badge {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: static; /* Back to normal flow */
     font-size: 0.75rem;
     background: rgba(14, 165, 233, 0.1);
     color: var(--accent-blue);
