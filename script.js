@@ -15,6 +15,7 @@ try {
     const gvwrDisplay = document.getElementById('gvwrDisplay');
     const weightProgressBar = document.getElementById('weightProgressBar');
     const remainingWeightValue = document.getElementById('remainingWeightValue');
+    const remainingWeightLabel = document.getElementById('remainingWeightLabel');
     const remainingDisplay = document.getElementById('remainingDisplay');
     
     const breakdownBase = document.getElementById('breakdownBase');
@@ -192,14 +193,17 @@ try {
             currentWeightContainer.classList.add('danger');
             weightProgressBar.classList.add('danger');
             remainingDisplay.classList.add('danger'); // Red for overload
-            remainingWeightValue.innerText = Math.round(remaining);
+            remainingWeightLabel.innerText = 'オーバー: ';
+            remainingWeightValue.innerText = Math.abs(Math.round(remaining));
         } else if (remaining <= 50) {
             // Less than or equal to 50kg remaining -> Warning (Orange)
             currentWeightContainer.classList.add('warning');
             weightProgressBar.classList.add('warning');
             remainingDisplay.classList.add('warning'); // Orange for warning
+            remainingWeightLabel.innerText = '許容限度まで: ';
             remainingWeightValue.innerText = Math.round(remaining);
         } else {
+            remainingWeightLabel.innerText = '許容限度まで: ';
             remainingWeightValue.innerText = Math.round(remaining);
         }
     };
