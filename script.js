@@ -335,6 +335,10 @@ try {
             if (optWaterTank) optWaterTank.checked = true;
             if (opt3012) opt3012.checked = true;
         }
+        // Default settings for E-max
+        if (style === 'emax' && opt4801) {
+            opt4801.checked = true;
+        }
     };
 
     styleRadios.forEach(radio => {
