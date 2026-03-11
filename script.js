@@ -327,11 +327,9 @@ try {
         const p3 = document.getElementById('p3');
         
         // Reset all optional checkboxes
-        // First, temporarily enable everything to ensure we can clear them, 
-        // but skipping the "always disabled" standard items if they exist.
         document.querySelectorAll('.option-checkbox').forEach(cb => {
-            // Check if it's one of the manually disabled options (standard equipment like 清水タンク)
-            const isStandard = cb.closest('.option-item')?.classList.contains('disabled') && cb.disabled;
+            // Check if it's one of the permanent standard equipment items
+            const isStandard = cb.dataset.standard === 'true';
             
             if (!isStandard) {
                 cb.disabled = false;
