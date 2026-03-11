@@ -95,6 +95,13 @@ header p {
     border: 1px solid rgba(14, 165, 233, 0.3);
 }
 
+.sub-title {
+    color: #000;
+    font-weight: 700;
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+}
+
 .dashboard {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
