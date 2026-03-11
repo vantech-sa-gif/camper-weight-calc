@@ -14,7 +14,6 @@ try {
     const totalWeightDisplay = document.getElementById('totalWeightDisplay');
     const gvwrDisplay = document.getElementById('gvwrDisplay');
     const weightProgressBar = document.getElementById('weightProgressBar');
-    const statusMessage = document.getElementById('statusMessage');
     
     const breakdownBase = document.getElementById('breakdownBase');
     const breakdownPassengers = document.getElementById('breakdownPassengers');
@@ -184,23 +183,15 @@ try {
         // Reset classes
         currentWeightContainer.className = 'current-weight';
         weightProgressBar.className = 'progress-bar';
-        statusMessage.className = 'status-message';
         
         if (remaining < 0) {
             // Overloaded
             currentWeightContainer.classList.add('danger');
             weightProgressBar.classList.add('danger');
-            statusMessage.classList.add('danger');
-            statusMessage.innerText = `⚠️ 重量超過です！許容総重量（GVWR）を ${Math.abs(Math.round(remaining))}kg 超えています。`;
         } else if (remaining <= 50) {
             // Less than or equal to 50kg remaining -> Warning
             currentWeightContainer.classList.add('warning');
             weightProgressBar.classList.add('warning');
-            statusMessage.classList.add('warning');
-            statusMessage.innerText = `⚠️ 警告！残り ${Math.round(remaining)}kg です。リミットに非常に近付いています。`;
-        } else {
-            // Safe
-            statusMessage.innerText = `安全圏です！あと ${Math.round(remaining)}kg の積載余裕があります。`;
         }
     };
 
