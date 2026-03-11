@@ -447,6 +447,29 @@ input[type="number"]:focus, select:focus {
     .summary-section {
         order: -1; /* Move summary to top on mobile */
     }
+
+    .main-logo, header p {
+        margin-left: 0;
+        max-width: 260px;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-container {
+        padding: 1rem;
+    }
+
+    .current-weight {
+        font-size: 2.8rem;
+    }
+
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 500px) {
