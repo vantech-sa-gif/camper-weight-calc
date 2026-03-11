@@ -245,24 +245,16 @@ input[type="number"]:focus, select:focus {
     transition: width 0.5s cubic-bezier(0.1, 0.7, 0.1, 1), background-color 0.3s ease;
 }
 
-.status-message {
+.remaining-display {
     text-align: center;
-    font-weight: 500;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--accent-green);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
 }
 
-.status-message.warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--accent-yellow);
-}
-
-.status-message.danger {
-    background: rgba(239, 68, 68, 0.1);
+.remaining-display.danger {
     color: var(--accent-red);
 }
 

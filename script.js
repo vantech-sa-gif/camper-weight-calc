@@ -14,6 +14,8 @@ try {
     const totalWeightDisplay = document.getElementById('totalWeightDisplay');
     const gvwrDisplay = document.getElementById('gvwrDisplay');
     const weightProgressBar = document.getElementById('weightProgressBar');
+    const remainingWeightValue = document.getElementById('remainingWeightValue');
+    const remainingDisplay = document.getElementById('remainingDisplay');
     
     const breakdownBase = document.getElementById('breakdownBase');
     const breakdownPassengers = document.getElementById('breakdownPassengers');
@@ -188,10 +190,17 @@ try {
             // Overloaded
             currentWeightContainer.classList.add('danger');
             weightProgressBar.classList.add('danger');
+            remainingDisplay.classList.add('danger');
+            remainingWeightValue.innerText = Math.round(remaining);
         } else if (remaining <= 50) {
-            // Less than or equal to 50kg remaining -> Warning
+            // Less than or equal to 50kg remaining -> Warning/Noticeable
             currentWeightContainer.classList.add('warning');
             weightProgressBar.classList.add('warning');
+            remainingDisplay.classList.add('danger'); // Turn red as requested
+            remainingWeightValue.innerText = Math.round(remaining);
+        } else {
+            remainingDisplay.classList.remove('danger');
+            remainingWeightValue.innerText = Math.round(remaining);
         }
     };
 
