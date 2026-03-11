@@ -61,7 +61,7 @@ header {
     max-width: 308px; /* Increosed by 10% from 280px */
     height: auto;
     display: block;
-    margin-left: calc(0px - 180mm); /* Moved significantly left (total 180mm) */
+    margin-left: calc(0px - 220mm); /* Moved even further left (total 220mm) */
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
     transition: transform 0.3s ease;
     mix-blend-mode: multiply;
@@ -80,7 +80,7 @@ header p {
     align-items: center;
     width: 100%;
     margin-top: 0.5rem; /* Space below the logo */
-    margin-left: calc(0px - 180mm); /* Match logo shift to stay centered under it */
+    margin-left: calc(0px - 220mm); /* Match logo shift to stay centered under it */
 }
 
 .version-badge {
