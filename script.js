@@ -326,6 +326,20 @@ try {
         const p4 = document.getElementById('p4');
         const p3 = document.getElementById('p3');
         
+        // Reset all optional checkboxes
+        // First, temporarily enable everything to ensure we can clear them, 
+        // but skipping the "always disabled" standard items if they exist.
+        document.querySelectorAll('.option-checkbox').forEach(cb => {
+            // Check if it's one of the manually disabled options (standard equipment like 清水タンク)
+            const isStandard = cb.closest('.option-item')?.classList.contains('disabled') && cb.disabled;
+            
+            if (!isStandard) {
+                cb.disabled = false;
+                cb.parentElement.classList.remove('disabled');
+                cb.checked = false;
+            }
+        });
+
         if (style === 'family' && p6) p6.checked = true;
         if ((style === 'emax' || style === 'wmax') && p4) p4.checked = true;
         if (style === 'premium' && p3) p3.checked = true;
@@ -338,6 +352,11 @@ try {
         // Default settings for E-max
         if (style === 'emax' && opt4801) {
             opt4801.checked = true;
+        }
+        
+        // Default settings for Premium
+        if (style === 'premium' && optWaterTank) {
+            optWaterTank.checked = true;
         }
     };
 
