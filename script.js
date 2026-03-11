@@ -423,11 +423,13 @@ try {
     // Run once on load to establish initial state
     updateExclusivity();
 
-    // Scroll Animation for Header
+    // Scroll Animation for Header (Optimized for Mobile)
     const header = document.querySelector('header');
     if (header) {
-        window.addEventListener('scroll', () => {
-            const scrollPos = window.scrollY;
+        let ticking = false;
+        
+        const updateHeader = () => {
+            const scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
             const fadeLimit = 150; 
             
             let opacity = 1 - (scrollPos / fadeLimit);
@@ -436,7 +438,16 @@ try {
             header.style.opacity = opacity;
             header.style.transform = `translateY(-${(1 - opacity) * 15}px)`;
             header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-        });
+            
+            ticking = false;
+        };
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        }, { passive: true });
     }
 
     const inputs = document.querySelectorAll('input, select');
