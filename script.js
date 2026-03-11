@@ -331,8 +331,9 @@ try {
         if (style === 'premium' && p3) p3.checked = true;
 
         // Default settings for W-max
-        if (style === 'wmax' && optWaterTank) {
-            optWaterTank.checked = true;
+        if (style === 'wmax') {
+            if (optWaterTank) optWaterTank.checked = true;
+            if (opt3012) opt3012.checked = true;
         }
     };
 
