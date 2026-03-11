@@ -77,13 +77,16 @@ header p {
     color: var(--text-secondary);
     font-size: 1.1rem;
     display: flex;
-    justify-content: center; /* Centers the version badge */
+    justify-content: flex-start; /* Aligned to left */
     align-items: center;
-    width: 100%; /* Take full width to center properly */
-    margin-top: -1.5rem; /* Pull it up slightly closer to the logo baseline if needed, adjust as want */
+    width: 100%;
+    margin-top: 0.5rem; /* Reset margin since it's no longer centered below logo */
 }
 
 .version-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
     font-size: 0.75rem;
     background: rgba(14, 165, 233, 0.1);
     color: var(--accent-blue);
