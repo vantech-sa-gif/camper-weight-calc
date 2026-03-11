@@ -185,21 +185,21 @@ try {
         // Reset classes
         currentWeightContainer.className = 'current-weight';
         weightProgressBar.className = 'progress-bar';
+        remainingDisplay.className = 'remaining-display';
         
         if (remaining < 0) {
             // Overloaded
             currentWeightContainer.classList.add('danger');
             weightProgressBar.classList.add('danger');
-            remainingDisplay.classList.add('danger');
+            remainingDisplay.classList.add('danger'); // Red for overload
             remainingWeightValue.innerText = Math.round(remaining);
         } else if (remaining <= 50) {
-            // Less than or equal to 50kg remaining -> Warning/Noticeable
+            // Less than or equal to 50kg remaining -> Warning (Orange)
             currentWeightContainer.classList.add('warning');
             weightProgressBar.classList.add('warning');
-            remainingDisplay.classList.add('danger'); // Turn red as requested
+            remainingDisplay.classList.add('warning'); // Orange for warning
             remainingWeightValue.innerText = Math.round(remaining);
         } else {
-            remainingDisplay.classList.remove('danger');
             remainingWeightValue.innerText = Math.round(remaining);
         }
     };

@@ -254,6 +254,10 @@ input[type="number"]:focus, select:focus {
     transition: color 0.3s ease;
 }
 
+.remaining-display.warning {
+    color: var(--accent-yellow);
+}
+
 .remaining-display.danger {
     color: var(--accent-red);
 }
