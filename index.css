@@ -61,7 +61,7 @@ header {
     max-width: 308px; /* Increosed by 10% from 280px */
     height: auto;
     display: block;
-    margin-left: calc(0px - 10mm); /* Pull it left by 10mm from center or its natural container position */
+    margin-left: calc(0px - 30mm); /* Moved further left by 20mm (total 30mm) */
     align-self: flex-start; /* Ensures the logo stays on the left */
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
     transition: transform 0.3s ease;
