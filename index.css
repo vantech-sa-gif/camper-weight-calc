@@ -249,7 +249,7 @@ input[type="number"]:focus, select:focus {
     text-align: center;
     font-weight: 600;
     font-size: 1.1rem;
-    color: var(--text-secondary);
+    color: var(--accent-green);
     margin-bottom: 2rem;
     transition: color 0.3s ease;
 }
