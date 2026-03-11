@@ -423,6 +423,22 @@ try {
     // Run once on load to establish initial state
     updateExclusivity();
 
+    // Scroll Animation for Header
+    const header = document.querySelector('header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.scrollY;
+            const fadeLimit = 150; 
+            
+            let opacity = 1 - (scrollPos / fadeLimit);
+            opacity = Math.max(0, Math.min(1, opacity));
+            
+            header.style.opacity = opacity;
+            header.style.transform = `translateY(-${(1 - opacity) * 15}px)`;
+            header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+        });
+    }
+
     const inputs = document.querySelectorAll('input, select');
     inputs.forEach(input => {
         input.addEventListener('input', calculateWeight);
