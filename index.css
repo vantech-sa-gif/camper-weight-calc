@@ -41,6 +41,8 @@ body {
         radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.03), transparent 25%);
     z-index: -1;
     pointer-events: none;
+    transform: translateZ(0); /* Force compositing layer */
+    backface-visibility: hidden;
 }
 
 .app-container {
@@ -55,6 +57,9 @@ header {
     align-items: center; /* Center-align logo and text */
     margin-bottom: 2rem;
     position: relative;
+    will-change: opacity, transform; /* Hint for browser optimization */
+    transform: translateZ(0); /* Force compositing layer */
+    backface-visibility: hidden;
 }
 
 .main-logo {
