@@ -55,8 +55,7 @@ header {
     align-items: center; /* Center everything in the container */
     margin-bottom: 2rem;
     position: relative; /* Setup for absolute positioning of children if needed */
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    will-change: opacity, transform;
+    /* transition removed to prevent conflict with JS scroll-driven updates which can cause Chrome crashes */
 }
 
 .main-logo {

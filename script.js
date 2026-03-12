@@ -403,21 +403,23 @@
             });
         }
 
-        // Header Scroll Effect
+        // Header Scroll Effect - Optimized to prevent object allocation during scroll
         if (DOM.header) {
             let ticking = false;
+            const updateHeaderState = () => {
+                const scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+                let opacity = 1 - (scrollPos / CONFIG.FADE_LIMIT);
+                opacity = Math.max(0, Math.min(1, opacity));
+                
+                DOM.header.style.opacity = opacity;
+                DOM.header.style.transform = `translateY(-${(1 - opacity) * CONFIG.SCROLL_TRANSFORM_PX}px)`;
+                DOM.header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+                ticking = false;
+            };
+
             window.addEventListener('scroll', () => {
                 if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
-                        let opacity = 1 - (scrollPos / CONFIG.FADE_LIMIT);
-                        opacity = Math.max(0, Math.min(1, opacity));
-                        
-                        DOM.header.style.opacity = opacity;
-                        DOM.header.style.transform = `translateY(-${(1 - opacity) * CONFIG.SCROLL_TRANSFORM_PX}px)`;
-                        DOM.header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-                        ticking = false;
-                    });
+                    window.requestAnimationFrame(updateHeaderState);
                     ticking = true;
                 }
             }, { passive: true });
