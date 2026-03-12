@@ -1,467 +1,434 @@
-document.addEventListener('DOMContentLoaded', () => {
-try {
-    // -------------------------------------------------------------
-    // Element References
-    // -------------------------------------------------------------
-    // Inputs
-    const baseFrontWeightInput = document.getElementById('baseFrontWeight');
-    const baseRearWeightInput = document.getElementById('baseRearWeight');
-    const frontGawrInput = document.getElementById('frontGawr');
-    const rearGawrInput = document.getElementById('rearGawr');
-    const gvwrInput = document.getElementById('gvwr');
+/**
+ * V-CAL script.js
+ * Clean Architecture Refactor
+ * 
+ * 1. Constants: Elimination of magic numbers
+ * 2. Registry: Centralized DOM management
+ * 3. State: Reactive UI data handling
+ * 4. Calculator: Pure logic for weight computation
+ * 5. PolicyManager: Style & exclusivity rules
+ * 6. Renderer: Decoupled UI updates
+ */
 
-    // Outputs
-    const totalWeightDisplay = document.getElementById('totalWeightDisplay');
-    const gvwrDisplay = document.getElementById('gvwrDisplay');
-    const weightProgressBar = document.getElementById('weightProgressBar');
-    const remainingWeightValue = document.getElementById('remainingWeightValue');
-    const remainingWeightLabel = document.getElementById('remainingWeightLabel');
-    const remainingDisplay = document.getElementById('remainingDisplay');
-    
-    const breakdownBase = document.getElementById('breakdownBase');
-    const breakdownPassengers = document.getElementById('breakdownPassengers');
-    const breakdownWater = document.getElementById('breakdownWater');
-    const breakdownOptions = document.getElementById('breakdownOptions');
+const CONSTANTS = {
+    PASSENGER_WEIGHT: 55,
+    BASE_PASSENGERS_TOTAL: 6,
+    BASE_FRONT_PAX_WEIGHT: 110, // 2 pax * 55
+    BASE_REAR_PAX_WEIGHT: 220,  // 4 pax * 55
+    PAX_DISTRIBUTION_SUB: {
+        '4': { front: 65, rear: 45 },
+        '3': { front: 35, rear: 130 },
+        '6': { front: 0, rear: 0 }
+    },
+    WARNING_THRESHOLD_KG: 50
+};
 
-    // Axle Gauges
-    const frontWeightRaw = document.getElementById('frontWeightRaw');
-    const rearWeightRaw = document.getElementById('rearWeightRaw');
-    const frontGawrDisplay = document.getElementById('frontGawrDisplay');
-    const rearGawrDisplay = document.getElementById('rearGawrDisplay');
-    const frontRemaining = document.getElementById('frontRemaining');
-    const rearRemaining = document.getElementById('rearRemaining');
-    const frontProgressBar = document.getElementById('frontProgressBar');
-    const rearProgressBar = document.getElementById('rearProgressBar');
-    
-    // Parent elements for styling
-    const currentWeightContainer = totalWeightDisplay.parentElement;
+const APP_CONFIG = {
+    STYLES: {
+        'custom': { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
+        'family': { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
+        'wmax': { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true }, locks: ['opt_O4801'] },
+        'emax': { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
+        'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
+    },
+    EXCLUSIVITY: [
+        { group: ['opt_O4600'], excludes: ['opt_O4601', 'opt_O1404'] },
+        { group: ['opt_O4800'], excludes: ['opt_O4801'] },
+        { group: ['opt_O4801'], excludes: ['opt_O4800'] },
+        { group: ['opt_O3012'], requires: ['opt_WaterTank'], forceCheck: true }
+    ]
+};
 
-    // -------------------------------------------------------------
-    // Logic
-    // -------------------------------------------------------------
+class DOMRegistry {
+    constructor() {
+        this.inputs = {
+            baseFront: document.getElementById('baseFrontWeight'),
+            baseRear: document.getElementById('baseRearWeight'),
+            frontGawr: document.getElementById('frontGawr'),
+            rearGawr: document.getElementById('rearGawr'),
+            gvwr: document.getElementById('gvwr'),
+            styleRadios: document.querySelectorAll('input[name="camper_style"]'),
+            paxRadios: document.querySelectorAll('input[name="passengerCount"]'),
+            options: document.querySelectorAll('.option-checkbox'),
+            clearOptionsBtn: document.getElementById('clearOptionsBtn'),
+            paxSelector: document.getElementById('passengerSelector')
+        };
 
-    // Safe parse helper
-    const getVal = (el) => parseFloat(el.value) || 0;
+        this.outputs = {
+            totalWeight: document.getElementById('totalWeightDisplay'),
+            gvwr: document.getElementById('gvwrDisplay'),
+            progressBar: document.getElementById('weightProgressBar'),
+            remainingValue: document.getElementById('remainingWeightValue'),
+            remainingLabel: document.getElementById('remainingWeightLabel'),
+            remainingDisplay: document.getElementById('remainingDisplay'),
+            breakdownBase: document.getElementById('breakdownBase'),
+            breakdownPax: document.getElementById('breakdownPassengers'),
+            breakdownWater: document.getElementById('breakdownWater'),
+            breakdownOptions: document.getElementById('breakdownOptions'),
+            frontRaw: document.getElementById('frontWeightRaw'),
+            rearRaw: document.getElementById('rearWeightRaw'),
+            frontGawr: document.getElementById('frontGawrDisplay'),
+            rearGawr: document.getElementById('rearGawrDisplay'),
+            frontRemaining: document.getElementById('frontRemaining'),
+            rearRemaining: document.getElementById('rearRemaining'),
+            frontBar: document.getElementById('frontProgressBar'),
+            rearBar: document.getElementById('rearProgressBar')
+        };
 
-    // Debounce to prevent Chrome crashes with excessive execution
-    let calculateTimeout;
-    const calculateWeight = () => {
-        clearTimeout(calculateTimeout);
-        calculateTimeout = setTimeout(() => {
-            try {
-                console.log("calculateWeight logic executing...");
-        
-        // 1. Base
-        const baseFront = getVal(baseFrontWeightInput);
-        const baseRear = getVal(baseRearWeightInput);
-        const base = baseFront + baseRear;
+        this.header = document.querySelector('header');
+        this.totalWeightContainer = this.outputs.totalWeight?.parentElement;
+    }
+}
 
-        const frontGawr = getVal(frontGawrInput);
-        const rearGawr = getVal(rearGawrInput);
-        const gvwr = getVal(gvwrInput);
-        // 2. Passengers
-        const passCount = parseInt(document.querySelector('input[name="passengerCount"]:checked').value) || 0;
-        const passengers = passCount * 55;
-        
-        let passFrontSub = 0;
-        let passRearSub = 0;
-        
-        // Base is considered 6 passengers
-        if (passCount === 4) {
-            passFrontSub = 65;
-            passRearSub = 45;
-        } else if (passCount === 3) {
-            passFrontSub = 35;
-            passRearSub = 130;
+class AppState {
+    constructor(onChange) {
+        this.style = 'custom';
+        this.paxCount = 6;
+        this.selectedOptions = new Set();
+        this.onChange = onChange;
+    }
+
+    update(data) {
+        let changed = false;
+        for (const key in data) {
+            if (this[key] !== data[key]) {
+                this[key] = data[key];
+                changed = true;
+            }
         }
+        if (changed) this.onChange();
+    }
+}
+
+class WeightCalculator {
+    static calculate(state, baseWeights, optionData) {
+        const { passengers, passFrontSub, passRearSub } = this._getPaxData(state.paxCount);
         
-        // 4. Options
+        let waterTotal = 0;
         let optionsTotal = 0;
+        let additionalBaseWeight = 0;
         let optionsFront = 0;
         let optionsRear = 0;
-        let waterTotal = 0;
-        let additionalBaseWeight = 0; // standard equipment items
 
-        document.querySelectorAll('.option-checkbox:checked').forEach(cb => {
-            const isFreshWaterTank = cb.closest('.option-item').innerText.includes('清水タンク');
-            const isWater = cb.id === 'opt_WaterTank';
-            
-            if (isFreshWaterTank) {
-                // Treated as standard equipment
-                additionalBaseWeight += parseFloat(cb.dataset.total) || 0;
-            } else if (isWater) {
-                // Treated as water category for calculations only
-                waterTotal += parseFloat(cb.dataset.total) || 0;
-            } else {
-                // Regular option
-                optionsTotal += parseFloat(cb.dataset.total) || 0;
-            }
+        state.selectedOptions.forEach(id => {
+            const opt = optionData[id];
+            if (!opt) return;
 
-            optionsFront += parseFloat(cb.dataset.front) || 0;
-            optionsRear += parseFloat(cb.dataset.rear) || 0;
+            if (opt.isFreshWater) additionalBaseWeight += opt.total;
+            else if (opt.isWater) waterTotal += opt.total;
+            else optionsTotal += opt.total;
+
+            optionsFront += opt.front;
+            optionsRear += opt.rear;
         });
-        
-        let displayWaterTotal = waterTotal;
 
-        const allOptionsCombinedTotal = optionsTotal + waterTotal + additionalBaseWeight;
+        const totalFront = baseWeights.front + (CONSTANTS.BASE_FRONT_PAX_WEIGHT - passFrontSub) + optionsFront;
+        const totalRear = baseWeights.rear + (CONSTANTS.BASE_REAR_PAX_WEIGHT - passRearSub) + optionsRear;
+        const grandTotal = totalFront + totalRear;
+        const displayBase = baseWeights.front + baseWeights.rear + additionalBaseWeight;
 
-        // Grand Total
-        const total = base + passengers + allOptionsCombinedTotal;
-
-        // The base breakdown display value:
-        const displayBase = base + additionalBaseWeight;
-
-        // Base passenger distribution (assuming 6 pax total: 2 front, 4 rear)
-        // 55kg * 2 = 110kg front, 55kg * 4 = 220kg rear.
-        // Base weights from input already include these or are empty, but logic suggests:
-        const basePassFront = 110; 
-        const basePassRear = 220;
-        
-        const actualPassFront = basePassFront - passFrontSub;
-        const actualPassRear = basePassRear - passRearSub;
-        
-        const totalRear = baseRear + actualPassRear + optionsRear;
-        const totalFront = baseFront + actualPassFront + optionsFront;
-        updateUI(displayBase, passengers, displayWaterTotal, optionsTotal, total, gvwr, totalFront, totalRear, frontGawr, rearGawr);
-        console.log("Weight calculation updated successfully. Total:", total);
-            } catch (err) {
-                alert("Error in calculateWeight: " + err.message);
-            }
-        }, 100); // 100ms debounce
-    };
-
-    const updateUI = (displayBase, passengers, waterTotal, optionsTotal, total, gvwr, totalFront, totalRear, frontGawr, rearGawr) => {
-        // Update main text displays
-        totalWeightDisplay.innerText = Math.round(total);
-        gvwrDisplay.innerText = Math.round(gvwr);
-        
-        breakdownBase.innerText = `${Math.round(displayBase)} kg`;
-        breakdownPassengers.innerText = `${Math.round(passengers)} kg`;
-        if (breakdownWater) breakdownWater.innerText = `${Math.round(waterTotal)} kg`;
-        breakdownOptions.innerText = `${Math.round(optionsTotal)} kg`;
-
-        // Update Axle Gauges
-        frontWeightRaw.innerText = Math.round(totalFront);
-        rearWeightRaw.innerText = Math.round(totalRear);
-        frontGawrDisplay.innerText = Math.round(frontGawr);
-        rearGawrDisplay.innerText = Math.round(rearGawr);
-
-        // Update Progress Bars
-        const getPct = (val, max) => Math.min(Math.max((max > 0 ? (val / max) * 100 : 100), 0), 100);
-        
-        const totalPct = getPct(total, gvwr);
-        weightProgressBar.style.width = `${totalPct}%`;
-
-        const frontPct = getPct(totalFront, frontGawr);
-        frontProgressBar.style.width = `${frontPct}%`;
-
-        const rearPct = getPct(totalRear, rearGawr);
-        rearProgressBar.style.width = `${rearPct}%`;
-
-        // Style updates function
-        const updateAxleStatus = (current, limit, elRemaining, elBar) => {
-            const rem = limit - current;
-            elBar.className = 'progress-bar'; // reset
-            elRemaining.className = 'remaining';
-            
-            if (rem < 0) {
-                elBar.classList.add('danger');
-                elRemaining.classList.add('danger');
-                elRemaining.innerText = `⚠️ ${Math.abs(Math.round(rem))}kg オーバー`;
-            } else if (rem <= 50) {
-                elBar.classList.add('warning');
-                elRemaining.classList.add('warning');
-                elRemaining.innerText = `残り ${Math.round(rem)}kg`;
-            } else {
-                elRemaining.innerText = `残り ${Math.round(rem)}kg`;
-            }
+        return {
+            grandTotal,
+            displayBase,
+            passengers,
+            waterTotal,
+            optionsTotal,
+            totalFront,
+            totalRear
         };
+    }
 
-        updateAxleStatus(totalFront, frontGawr, frontRemaining, frontProgressBar);
-        updateAxleStatus(totalRear, rearGawr, rearRemaining, rearProgressBar);
-
-        // Status Logic
-        const remaining = gvwr - total;
-        
-        // Reset classes
-        currentWeightContainer.className = 'current-weight';
-        weightProgressBar.className = 'progress-bar';
-        remainingDisplay.className = 'remaining-display';
-        
-        if (remaining < 0) {
-            // Overloaded
-            currentWeightContainer.classList.add('danger');
-            weightProgressBar.classList.add('danger');
-            remainingDisplay.classList.add('danger'); // Red for overload
-            remainingWeightLabel.innerText = 'オーバー: ';
-            remainingWeightValue.innerText = Math.abs(Math.round(remaining));
-        } else if (remaining <= 50) {
-            // Less than or equal to 50kg remaining -> Warning (Orange)
-            currentWeightContainer.classList.add('warning');
-            weightProgressBar.classList.add('warning');
-            remainingDisplay.classList.add('warning'); // Orange for warning
-            remainingWeightLabel.innerText = '許容限度まで: ';
-            remainingWeightValue.innerText = Math.round(remaining);
-        } else {
-            remainingWeightLabel.innerText = '許容限度まで: ';
-            remainingWeightValue.innerText = Math.round(remaining);
-        }
-    };
-
-    // -------------------------------------------------------------
-    // Event Listeners
-    // -------------------------------------------------------------
-    
-    // Exclusivity Rules
-    const opt1404 = document.getElementById('opt_O1404');
-    const opt3012 = document.getElementById('opt_O3012'); // Water Heater
-    const opt4600 = document.getElementById('opt_O4600');
-    const opt4601 = document.getElementById('opt_O4601');
-    const opt4800 = document.getElementById('opt_O4800');
-    const opt4801 = document.getElementById('opt_O4801');
-    const optWaterTank = document.getElementById('opt_WaterTank');
-
-    const updateExclusivity = () => {
-        const disableOpt = (opt) => {
-            if (!opt || opt.disabled) return; // Skip if already disabled
-            opt.disabled = true;
-            opt.parentElement.classList.add('disabled');
+    static _getPaxData(count) {
+        const sub = CONSTANTS.PAX_DISTRIBUTION_SUB[count] || { front: 0, rear: 0 };
+        return {
+            passengers: count * CONSTANTS.PASSENGER_WEIGHT,
+            passFrontSub: sub.front,
+            passRearSub: sub.rear
         };
+    }
+}
 
-        const enableOpt = (opt) => {
-            if (!opt || !opt.disabled) return; // Skip if already enabled
-            opt.disabled = false;
-            opt.parentElement.classList.remove('disabled');
-        };
+class PolicyManager {
+    static applyStyle(styleId, registry) {
+        const config = APP_CONFIG.STYLES[styleId];
+        if (!config) return;
 
-        // Solar & Window (O4600 vs O4601/O1404)
-        if (opt4600 && opt4601 && opt1404) {
-            if (opt4600.checked) {
-                disableOpt(opt4601);
-                disableOpt(opt1404);
-            } else {
-                if (opt4601.checked || opt1404.checked) {
-                    disableOpt(opt4600);
-                } else {
-                    enableOpt(opt4600);
-                    enableOpt(opt4601);
-                    enableOpt(opt1404);
-                }
-            }
-        }
+        // Reset and Apply Pax
+        const targetPax = document.getElementById(`p${config.defaultPax}`);
+        if (targetPax) targetPax.checked = true;
 
-        // Battery (O4800 vs O4801)
-        if (opt4800 && opt4801) {
-            if (opt4800.checked) {
-                disableOpt(opt4801);
-            } else if (opt4801.checked) {
-                disableOpt(opt4800);
-            } else {
-                enableOpt(opt4800);
-                enableOpt(opt4801);
-            }
-        }
-
-        // Water Heater (O3012) requires Water Tank
-        if (opt3012 && optWaterTank) {
-            // Reset both to enabled first
-            enableOpt(opt3012);
-            enableOpt(optWaterTank);
-            
-            if (opt3012.checked) {
-                // If water heater is checked, water tank MUST be checked AND disabled so it can't be unchecked
-                optWaterTank.checked = true;
-                disableOpt(optWaterTank);
-            } else if (!optWaterTank.checked) {
-                // If water tank is NOT checked, water heater MUST NOT be checked AND disabled
-                opt3012.checked = false;
-                disableOpt(opt3012);
-            }
-        }
-
-        // --------------------------------------------------------
-        // Style Overrides (Run last to enforce locks)
-        // --------------------------------------------------------
-        const style = document.querySelector('input[name="camper_style"]:checked')?.value || 'custom';
-        const passengerTabs = document.getElementById('passengerSelector');
-
-        if (passengerTabs) {
-            if (style === 'custom') {
-                passengerTabs.classList.remove('locked');
-            } else {
-                passengerTabs.classList.add('locked');
-            }
-        }
-
-        if (style === 'family') {
-            if (optWaterTank) {
-                optWaterTank.checked = false;
-                disableOpt(optWaterTank);
-            }
-            if (opt3012) {
-                opt3012.checked = false;
-                disableOpt(opt3012);
-            }
-            if (opt4801) {
-                opt4801.checked = false;
-                disableOpt(opt4801);
-            }
-        } else if (style === 'wmax') {
-            if (opt4801) {
-                opt4801.checked = false;
-                disableOpt(opt4801);
-            }
-        } else if (style === 'emax') {
-            if (optWaterTank) {
-                optWaterTank.checked = false;
-                disableOpt(optWaterTank);
-            }
-            if (opt3012) {
-                opt3012.checked = false;
-                disableOpt(opt3012);
-            }
-        }
-    };
-
-    // Style Radio Listeners
-    const styleRadios = document.querySelectorAll('input[name="camper_style"]');
-    const applyPassengerStyle = (style) => {
-        const p6 = document.getElementById('p6');
-        const p4 = document.getElementById('p4');
-        const p3 = document.getElementById('p3');
-        
-        // Reset all optional checkboxes
-        document.querySelectorAll('.option-checkbox').forEach(cb => {
-            // Check if it's one of the permanent standard equipment items
-            const isStandard = cb.dataset.standard === 'true';
-            
-            if (!isStandard) {
+        // Reset options visibility/accessibility
+        registry.inputs.options.forEach(cb => {
+            if (cb.dataset.standard !== 'true') {
                 cb.disabled = false;
                 cb.parentElement.classList.remove('disabled');
-                cb.checked = false;
             }
         });
 
-        if (style === 'family' || style === 'custom') {
-            if (p6) p6.checked = true;
-        }
-        if ((style === 'emax' || style === 'wmax') && p4) p4.checked = true;
-        if (style === 'premium' && p3) p3.checked = true;
-
-        // Default settings for Custom
-        if (style === 'custom' && optWaterTank) {
-            optWaterTank.checked = true;
-        }
-        // Default settings for W-max
-        if (style === 'wmax') {
-            if (optWaterTank) optWaterTank.checked = true;
-            if (opt3012) opt3012.checked = true;
-        }
-        // Default settings for E-max
-        if (style === 'emax' && opt4801) {
-            opt4801.checked = true;
-        }
-        
-        // Default settings for Premium
-        if (style === 'premium' && optWaterTank) {
-            optWaterTank.checked = true;
-        }
-    };
-
-    styleRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            applyPassengerStyle(e.target.value);
-            updateExclusivity();
-            calculateWeight();
-        });
-    });
-
-    if (opt4600 && opt4601 && opt1404) {
-        opt4600.addEventListener('change', updateExclusivity);
-        opt4601.addEventListener('change', updateExclusivity);
-        opt1404.addEventListener('change', updateExclusivity);
-    }
-    
-    if (opt4800 && opt4801) {
-        opt4800.addEventListener('change', updateExclusivity);
-        opt4801.addEventListener('change', updateExclusivity);
-    }
-
-    if (optWaterTank) {
-        optWaterTank.addEventListener('change', () => {
-            updateExclusivity();
-            calculateWeight();
-        });
-    }
-
-    // Also run for Water Heater changes if user tries to check it
-    if (opt3012) {
-        opt3012.addEventListener('change', () => {
-            updateExclusivity();
-            calculateWeight();
-        });
-    }
-
-    // Clear All Options Button
-    const clearOptionsBtn = document.getElementById('clearOptionsBtn');
-    if (clearOptionsBtn) {
-        clearOptionsBtn.addEventListener('click', () => {
-            // Find all option checkboxes but exclude water tanks if they aren't part of the "Options" grid
-            // In this case, we only want to clear the main Option card checkboxes
-            const optionCard = clearOptionsBtn.closest('.card');
-            const checkboxesToClear = optionCard.querySelectorAll('.option-checkbox');
-            
-            checkboxesToClear.forEach(cb => {
-                cb.checked = false;
+        // Set Default options
+        if (config.defaults) {
+            Object.keys(config.defaults).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = config.defaults[id];
             });
-            // Also reset to defaults for the exclusivity check to re-enable everything
-            updateExclusivity();
-            calculateWeight();
-        });
+        }
+
+        // Apply Locks
+        if (config.locks) {
+            config.locks.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.checked = false;
+                    el.disabled = true;
+                    el.parentElement.classList.add('disabled');
+                }
+            });
+        }
+
+        // Lock Pax Selector
+        const isCustom = styleId === 'custom';
+        registry.inputs.paxSelector?.classList.toggle('locked', !isCustom);
     }
 
-    // Run once on load to establish initial state
-    updateExclusivity();
-
-    // Scroll Animation for Header (Optimized for Mobile)
-    const header = document.querySelector('header');
-    if (header) {
-        let ticking = false;
-        
-        const updateHeader = () => {
-            const scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
-            const fadeLimit = 150; 
-            
-            let opacity = 1 - (scrollPos / fadeLimit);
-            opacity = Math.max(0, Math.min(1, opacity));
-            
-            header.style.opacity = opacity;
-            header.style.transform = `translateY(-${(1 - opacity) * 15}px)`;
-            header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-            
-            ticking = false;
+    static applyExclusivity() {
+        const disableOpt = (el) => {
+            el.disabled = true;
+            el.parentElement.classList.add('disabled');
         };
 
+        APP_CONFIG.EXCLUSIVITY.forEach(rule => {
+            const isGroupChecked = rule.group.some(id => document.getElementById(id)?.checked);
+            
+            if (isGroupChecked) {
+                if (rule.excludes) {
+                    rule.excludes.forEach(targetId => {
+                        const target = document.getElementById(targetId);
+                        if (target) disableOpt(target);
+                    });
+                }
+                if (rule.forceCheck) {
+                    rule.requires.forEach(targetId => {
+                        const target = document.getElementById(targetId);
+                        if (target) {
+                            target.checked = true;
+                            disableOpt(target);
+                        }
+                    });
+                }
+            } else if (rule.forceCheck) {
+                const isRequiredChecked = rule.requires.some(id => document.getElementById(id)?.checked);
+                if (!isRequiredChecked) {
+                    rule.group.forEach(id => {
+                        const target = document.getElementById(id);
+                        if (target) {
+                            target.checked = false;
+                            disableOpt(target);
+                        }
+                    });
+                }
+            }
+        });
+    }
+}
+
+class Renderer {
+    static update(results, limits, registry) {
+        const { outputs, totalWeightContainer } = registry;
+        
+        // Main Displays
+        outputs.totalWeight.innerText = Math.round(results.grandTotal);
+        outputs.gvwr.innerText = Math.round(limits.gvwr);
+        outputs.breakdownBase.innerText = `${Math.round(results.displayBase)} kg`;
+        outputs.breakdownPax.innerText = `${Math.round(results.passengers)} kg`;
+        if (outputs.breakdownWater) outputs.breakdownWater.innerText = `${Math.round(results.waterTotal)} kg`;
+        outputs.breakdownOptions.innerText = `${Math.round(results.optionsTotal)} kg`;
+
+        // Axle Gauges
+        outputs.frontRaw.innerText = Math.round(results.totalFront);
+        outputs.rearRaw.innerText = Math.round(results.totalRear);
+        outputs.frontGawr.innerText = Math.round(limits.frontGawr);
+        outputs.rearGawr.innerText = Math.round(limits.rearGawr);
+
+        // Progress Bars & Status
+        this._updateBar(outputs.progressBar, results.grandTotal, limits.gvwr);
+        this._updateBar(outputs.frontBar, results.totalFront, limits.frontGawr);
+        this._updateBar(outputs.rearBar, results.totalRear, limits.rearGawr);
+
+        this._updateStatusLabel(outputs.remainingValue, outputs.remainingLabel, outputs.remainingDisplay, totalWeightContainer, outputs.progressBar, results.grandTotal, limits.gvwr);
+        this._updateAxleStatus(outputs.frontRemaining, outputs.frontBar, results.totalFront, limits.frontGawr);
+        this._updateAxleStatus(outputs.rearRemaining, outputs.rearBar, results.totalRear, limits.rearGawr);
+    }
+
+    static _updateBar(bar, val, max) {
+        if (!bar) return;
+        const pct = Math.min(Math.max((max > 0 ? (val / max) * 100 : 100), 0), 100);
+        bar.style.width = `${pct}%`;
+    }
+
+    static _updateAxleStatus(label, bar, current, limit) {
+        if (!label || !bar) return;
+        const rem = limit - current;
+        bar.className = 'progress-bar';
+        label.className = 'remaining';
+
+        if (rem < 0) {
+            bar.classList.add('danger');
+            label.classList.add('danger');
+            label.innerText = `⚠️ ${Math.abs(Math.round(rem))}kg オーバー`;
+        } else if (rem <= CONSTANTS.WARNING_THRESHOLD_KG) {
+            bar.classList.add('warning');
+            label.classList.add('warning');
+            label.innerText = `残り ${Math.round(rem)}kg`;
+        } else {
+            label.innerText = `残り ${Math.round(rem)}kg`;
+        }
+    }
+
+    static _updateStatusLabel(valueEl, labelEl, containerEl, weightContainer, barEl, total, gvwr) {
+        if (!valueEl || !labelEl || !containerEl || !weightContainer || !barEl) return;
+        const remaining = gvwr - total;
+        
+        weightContainer.className = 'current-weight';
+        barEl.className = 'progress-bar';
+        containerEl.className = 'remaining-display';
+
+        if (remaining < 0) {
+            weightContainer.classList.add('danger');
+            barEl.classList.add('danger');
+            containerEl.classList.add('danger');
+            labelEl.innerText = 'オーバー: ';
+            valueEl.innerText = Math.abs(Math.round(remaining));
+        } else if (remaining <= CONSTANTS.WARNING_THRESHOLD_KG) {
+            weightContainer.classList.add('warning');
+            barEl.classList.add('warning');
+            containerEl.classList.add('warning');
+            labelEl.innerText = '許容限度まで: ';
+            valueEl.innerText = Math.round(remaining);
+        } else {
+            labelEl.innerText = '許容限度まで: ';
+            valueEl.innerText = Math.round(remaining);
+        }
+    }
+}
+
+class App {
+    constructor() {
+        try {
+            this.registry = new DOMRegistry();
+            this.state = new AppState(() => this.calculate());
+            this.calcTimeout = null;
+            this.init();
+        } catch (e) {
+            console.error("App Construction Error:", e);
+        }
+    }
+
+    init() {
+        this._attachListeners();
+        this._initScrollEffect();
+        this.syncState(true); // Initial override & calculation
+    }
+
+    _attachListeners() {
+        const { inputs } = this.registry;
+
+        inputs.styleRadios.forEach(r => r.addEventListener('change', (e) => {
+            this.state.style = e.target.value;
+            this.syncState(true);
+        }));
+
+        const syncEvents = ['change', 'input'];
+        [...inputs.paxRadios, ...inputs.options].forEach(input => {
+            syncEvents.forEach(ev => input.addEventListener(ev, () => this.syncState()));
+        });
+
+        inputs.clearOptionsBtn?.addEventListener('click', () => {
+            const optionCard = inputs.clearOptionsBtn.closest('.card');
+            optionCard.querySelectorAll('.option-checkbox').forEach(cb => cb.checked = false);
+            this.syncState();
+        });
+    }
+
+    _initScrollEffect() {
+        const { header } = this.registry;
+        if (!header) return;
+        let ticking = false;
         window.addEventListener('scroll', () => {
             if (!ticking) {
-                window.requestAnimationFrame(updateHeader);
+                window.requestAnimationFrame(() => {
+                    const scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+                    const opacity = Math.max(0, Math.min(1, 1 - (scrollPos / 150)));
+                    header.style.opacity = opacity;
+                    header.style.transform = `translateZ(0) translateY(-${(1 - opacity) * 15}px)`;
+                    header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+                    ticking = false;
+                });
                 ticking = true;
             }
         }, { passive: true });
     }
 
-    const inputs = document.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.addEventListener('input', calculateWeight);
-        if (input.type === 'checkbox' || input.type === 'radio') {
-            input.addEventListener('change', calculateWeight);
+    syncState(forceOverride = false) {
+        if (forceOverride) {
+            PolicyManager.applyStyle(this.state.style, this.registry);
         }
-    });
+        PolicyManager.applyExclusivity();
 
-    // Initial calculation
-    calculateWeight();
-} catch (e) {
-    alert("JS Error: " + e.message + "\n\n" + e.stack);
-    console.error(e);
+        const selectedPax = document.querySelector('input[name="passengerCount"]:checked');
+        this.state.update({
+            paxCount: parseInt(selectedPax?.value) || 6,
+            selectedOptions: this._getCurrentlyCheckedOptionIds()
+        });
+    }
+
+    _getCurrentlyCheckedOptionIds() {
+        const ids = new Set();
+        this.registry.inputs.options.forEach(cb => {
+            if (cb.checked) {
+                const id = cb.id || cb.closest('.option-item').querySelector('.option-name').innerText;
+                ids.add(id);
+            }
+        });
+        return ids;
+    }
+
+    calculate() {
+        clearTimeout(this.calcTimeout);
+        this.calcTimeout = setTimeout(() => {
+            try {
+                const baseWeights = {
+                    front: parseFloat(this.registry.inputs.baseFront.value) || 0,
+                    rear: parseFloat(this.registry.inputs.baseRear.value) || 0
+                };
+                const limits = {
+                    gvwr: parseFloat(this.registry.inputs.gvwr.value) || 0,
+                    frontGawr: parseFloat(this.registry.inputs.frontGawr.value) || 0,
+                    rearGawr: parseFloat(this.registry.inputs.rearGawr.value) || 0
+                };
+
+                const results = WeightCalculator.calculate(this.state, baseWeights, this._getOptionDataMap());
+                Renderer.update(results, limits, this.registry);
+            } catch (e) {
+                console.error("Calculation/Render Error:", e);
+            }
+        }, 100);
+    }
+
+    _getOptionDataMap() {
+        const map = {};
+        this.registry.inputs.options.forEach(cb => {
+            const item = cb.closest('.option-item');
+            const id = cb.id || item.querySelector('.option-name').innerText;
+            map[id] = {
+                front: parseFloat(cb.dataset.front) || 0,
+                rear: parseFloat(cb.dataset.rear) || 0,
+                total: parseFloat(cb.dataset.total) || 0,
+                isFreshWater: item.innerText.includes('清水タンク'),
+                isWater: cb.id === 'opt_WaterTank'
+            };
+        });
+        return map;
+    }
 }
-});
+
+document.addEventListener('DOMContentLoaded', () => new App());
