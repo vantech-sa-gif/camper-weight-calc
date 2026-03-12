@@ -52,7 +52,7 @@ body {
 header {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align logo and text to the left */
+    align-items: center; /* Center-align logo and text */
     margin-bottom: 2rem;
     position: relative;
 }
@@ -67,17 +67,17 @@ header {
 
 .main-logo:hover {
     transform: scale(1.02);
-    transform-origin: left center;
+    transform-origin: center center;
 }
 
 header p {
     color: var(--text-secondary);
     font-size: 1.1rem;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 0.1rem;
+    margin-top: 0;
     gap: 0.75rem;
 }
 
@@ -96,7 +96,7 @@ header p {
 .sub-title {
     color: #000;
     font-weight: 700;
-    margin-top: 0.25rem;
+    margin-top: 0;
     font-size: 1.2rem;
 }
 
