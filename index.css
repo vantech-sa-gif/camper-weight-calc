@@ -56,16 +56,16 @@ header {
     margin-bottom: 2rem;
     position: relative; /* Setup for absolute positioning of children if needed */
     /* transition removed to prevent conflict with JS scroll-driven updates which can cause Chrome crashes */
+    transform: translateZ(0); /* Promote to compositor layer to fix Chrome crash on scroll */
 }
 
 .main-logo {
     max-width: 308px; /* Increosed by 10% from 280px */
     height: auto;
     display: block;
-    margin-left: calc(0px - 260mm); /* Moved even further left (total 260mm) */
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+    margin-left: -980px; /* Normalized from 260mm to reduce layout overhead */
+    /* filter and mix-blend-mode removed to resolve Chrome rendering crash during scroll */
     transition: transform 0.3s ease;
-    mix-blend-mode: multiply;
 }
 
 .main-logo:hover {
@@ -81,7 +81,7 @@ header p {
     align-items: center;
     width: 100%;
     margin-top: 0.1rem; /* Reduced space below the logo */
-    margin-left: calc(0px - 260mm); /* Match logo shift to stay centered under it */
+    margin-left: -980px; /* Normalized from 260mm to match logo shift */
 }
 
 .version-badge {
@@ -194,6 +194,7 @@ input[type="number"]:focus, select:focus {
 .sticky {
     position: sticky;
     top: 2rem;
+    transform: translateZ(0); /* Promote to compositor layer to fix rendering conflicts during scroll */
 }
 
 .summary-card {

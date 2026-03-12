@@ -413,7 +413,6 @@
                 
                 DOM.header.style.opacity = opacity;
                 DOM.header.style.transform = `translateY(-${(1 - opacity) * CONFIG.SCROLL_TRANSFORM_PX}px)`;
-                DOM.header.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
                 ticking = false;
             };
 
