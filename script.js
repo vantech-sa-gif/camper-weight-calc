@@ -144,7 +144,7 @@
                 DOM.optionCheckboxes().forEach(cb => {
                     if (!cb.checked) return;
 
-                    const isFreshWaterTank = cb.closest('.option-item')?.innerText.includes('清水タンク');
+                    const isFreshWaterTank = cb.closest('.option-item')?.textContent.includes('清水タンク');
                     const isWater = cb.id === 'opt_WaterTank';
                     const weightTotal = parseFloat(cb.dataset.total) || 0;
                     const weightFront = parseFloat(cb.dataset.front) || 0;
@@ -202,19 +202,19 @@
         } = data;
 
         // Main Displays
-        DOM.totalWeightDisplay.innerText = Math.round(totalWeight);
-        DOM.gvwrDisplay.innerText = Math.round(gvwr);
+        DOM.totalWeightDisplay.textContent = Math.round(totalWeight);
+        DOM.gvwrDisplay.textContent = Math.round(gvwr);
         
-        DOM.breakdownBase.innerText = `${Math.round(displayBaseWeight)} kg`;
-        DOM.breakdownPassengers.innerText = `${Math.round(passengersTotalWeight)} kg`;
-        if (DOM.breakdownWater) DOM.breakdownWater.innerText = `${Math.round(waterTotal)} kg`;
-        DOM.breakdownOptions.innerText = `${Math.round(optionsTotal)} kg`;
+        DOM.breakdownBase.textContent = `${Math.round(displayBaseWeight)} kg`;
+        DOM.breakdownPassengers.textContent = `${Math.round(passengersTotalWeight)} kg`;
+        if (DOM.breakdownWater) DOM.breakdownWater.textContent = `${Math.round(waterTotal)} kg`;
+        DOM.breakdownOptions.textContent = `${Math.round(optionsTotal)} kg`;
 
         // Axle Gauges
-        DOM.frontWeightRaw.innerText = Math.round(totalFrontWeight);
-        DOM.rearWeightRaw.innerText = Math.round(totalRearWeight);
-        DOM.frontGawrDisplay.innerText = Math.round(frontGawr);
-        DOM.rearGawrDisplay.innerText = Math.round(rearGawr);
+        DOM.frontWeightRaw.textContent = Math.round(totalFrontWeight);
+        DOM.rearWeightRaw.textContent = Math.round(totalRearWeight);
+        DOM.frontGawrDisplay.textContent = Math.round(frontGawr);
+        DOM.rearGawrDisplay.textContent = Math.round(rearGawr);
 
         // Progress Bars
         DOM.weightProgressBar.style.width = `${getPct(totalWeight, gvwr)}%`;
@@ -230,13 +230,13 @@
             if (rem < 0) {
                 elBar.classList.add('danger');
                 elRemaining.classList.add('danger');
-                elRemaining.innerText = `⚠️ ${Math.abs(Math.round(rem))}kg オーバー`;
+                elRemaining.textContent = `⚠️ ${Math.abs(Math.round(rem))}kg オーバー`;
             } else if (rem <= CONFIG.THRESHOLD_WARNING) {
                 elBar.classList.add('warning');
                 elRemaining.classList.add('warning');
-                elRemaining.innerText = `残り ${Math.round(rem)}kg`;
+                elRemaining.textContent = `残り ${Math.round(rem)}kg`;
             } else {
-                elRemaining.innerText = `残り ${Math.round(rem)}kg`;
+                elRemaining.textContent = `残り ${Math.round(rem)}kg`;
             }
         };
 
@@ -253,17 +253,17 @@
             DOM.currentWeightContainer.classList.add('danger');
             DOM.weightProgressBar.classList.add('danger');
             DOM.remainingDisplay.classList.add('danger');
-            DOM.remainingWeightLabel.innerText = 'オーバー: ';
-            DOM.remainingWeightValue.innerText = Math.abs(Math.round(remaining));
+            DOM.remainingWeightLabel.textContent = 'オーバー: ';
+            DOM.remainingWeightValue.textContent = Math.abs(Math.round(remaining));
         } else if (remaining <= CONFIG.THRESHOLD_WARNING) {
             DOM.currentWeightContainer.classList.add('warning');
             DOM.weightProgressBar.classList.add('warning');
             DOM.remainingDisplay.classList.add('warning');
-            DOM.remainingWeightLabel.innerText = '許容限度まで: ';
-            DOM.remainingWeightValue.innerText = Math.round(remaining);
+            DOM.remainingWeightLabel.textContent = '許容限度まで: ';
+            DOM.remainingWeightValue.textContent = Math.round(remaining);
         } else {
-            DOM.remainingWeightLabel.innerText = '許容限度まで: ';
-            DOM.remainingWeightValue.innerText = Math.round(remaining);
+            DOM.remainingWeightLabel.textContent = '許容限度まで: ';
+            DOM.remainingWeightValue.textContent = Math.round(remaining);
         }
     };
 
