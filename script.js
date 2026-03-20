@@ -306,7 +306,7 @@ class Renderer {
             weightContainer.classList.add('warning');
             barEl.classList.add('warning');
             containerEl.classList.add('warning');
-            labelEl.innerText = '注意域 残り: ';
+            labelEl.innerText = '許容限度まで: ';
             valueEl.innerText = Math.round(remaining);
         } else {
             labelEl.innerText = '許容限度まで: ';
