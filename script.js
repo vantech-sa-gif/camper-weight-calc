@@ -20,7 +20,8 @@ const CONSTANTS = {
         '3': { front: 35, rear: 130 },
         '6': { front: 0, rear: 0 }
     },
-    WARNING_THRESHOLD_KG: 50
+    WARNING_PCT: 0.81,
+    DANGER_PCT: 0.96
 };
 
 const APP_CONFIG = {
@@ -268,14 +269,16 @@ class Renderer {
     static _updateAxleStatus(label, bar, current, limit) {
         if (!label || !bar) return;
         const rem = limit - current;
+        let pct = limit > 0 ? (current / limit) : 1;
+        
         bar.className = 'progress-bar';
         label.className = 'remaining';
 
-        if (rem < 0) {
+        if (pct >= CONSTANTS.DANGER_PCT) {
             bar.classList.add('danger');
             label.classList.add('danger');
-            label.innerText = `⚠️ ${Math.abs(Math.round(rem))}kg オーバー`;
-        } else if (rem <= CONSTANTS.WARNING_THRESHOLD_KG) {
+            label.innerText = rem < 0 ? `⚠️ ${Math.abs(Math.round(rem))}kg オーバー` : `残り ${Math.round(rem)}kg`;
+        } else if (pct >= CONSTANTS.WARNING_PCT) {
             bar.classList.add('warning');
             label.classList.add('warning');
             label.innerText = `残り ${Math.round(rem)}kg`;
@@ -287,22 +290,23 @@ class Renderer {
     static _updateStatusLabel(valueEl, labelEl, containerEl, weightContainer, barEl, total, gvwr) {
         if (!valueEl || !labelEl || !containerEl || !weightContainer || !barEl) return;
         const remaining = gvwr - total;
+        let pct = gvwr > 0 ? (total / gvwr) : 1;
         
         weightContainer.className = 'current-weight';
         barEl.className = 'progress-bar';
         containerEl.className = 'remaining-display';
 
-        if (remaining < 0) {
+        if (pct >= CONSTANTS.DANGER_PCT) {
             weightContainer.classList.add('danger');
             barEl.classList.add('danger');
             containerEl.classList.add('danger');
-            labelEl.innerText = 'オーバー: ';
+            labelEl.innerText = remaining < 0 ? 'オーバー: ' : '危険域 残り: ';
             valueEl.innerText = Math.abs(Math.round(remaining));
-        } else if (remaining <= CONSTANTS.WARNING_THRESHOLD_KG) {
+        } else if (pct >= CONSTANTS.WARNING_PCT) {
             weightContainer.classList.add('warning');
             barEl.classList.add('warning');
             containerEl.classList.add('warning');
-            labelEl.innerText = '許容限度まで: ';
+            labelEl.innerText = '注意域 残り: ';
             valueEl.innerText = Math.round(remaining);
         } else {
             labelEl.innerText = '許容限度まで: ';
