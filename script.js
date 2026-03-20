@@ -300,7 +300,7 @@ class Renderer {
             weightContainer.classList.add('danger');
             barEl.classList.add('danger');
             containerEl.classList.add('danger');
-            labelEl.innerText = remaining < 0 ? 'オーバー: ' : '危険域 残り: ';
+            labelEl.innerText = remaining < 0 ? 'オーバー: ' : '許容限度まで: ';
             valueEl.innerText = Math.abs(Math.round(remaining));
         } else if (pct >= CONSTANTS.WARNING_PCT) {
             weightContainer.classList.add('warning');
