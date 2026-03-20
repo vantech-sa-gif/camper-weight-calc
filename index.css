@@ -80,6 +80,9 @@ header {
     display: block;
     margin-bottom: 0.5rem;
     transition: transform 0.3s ease;
+    /* ダークベース上で視認できるように白抜き化 */
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
 }
 
 .main-logo:hover {
