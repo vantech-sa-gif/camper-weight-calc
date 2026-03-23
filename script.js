@@ -217,7 +217,10 @@ class PolicyManager {
                 if (rule.excludes) {
                     rule.excludes.forEach(targetId => {
                         const target = document.getElementById(targetId);
-                        if (target) disableOpt(target);
+                        if (target) {
+                            target.checked = false;
+                            disableOpt(target);
+                        }
                     });
                 }
                 if (rule.forceCheck) {
