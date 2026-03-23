@@ -13,7 +13,7 @@
     <div class="app-container">
         <header>
             <img src="logo.png" alt="V-CAL ロゴ" class="main-logo">
-            <p><span class="version-badge">v1.4</span></p>
+            <p><span class="version-badge">v1.5</span></p>
             <p><span class="sub-title">For Leaves3</span></p>
         </header>
 
@@ -64,114 +64,13 @@
                         <h2 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"><span class="icon">🛠️</span> オプション</h2>
                         <button id="clearOptionsBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--accent-red); background: rgba(239, 68, 68, 0.1); color: var(--accent-red); cursor: pointer; transition: all 0.2s;">全選択解除</button>
                     </div>
-                    <div class="options-grid">
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="4" data-rear="19" data-total="23">
-                            <div class="option-content">
-                                <span class="option-name">サイドオーニング3.5m (O1026)</span>
-                                <span class="option-weight">+23kg (F: 4, R: 19)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O1404" data-front="5" data-rear="0" data-total="5">
-                            <div class="option-content">
-                                <span class="option-name">ルーフウィンドウ (O1404)</span>
-                                <span class="option-weight">+5kg (F: 5, R: 0)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="7" data-total="5">
-                            <div class="option-content">
-                                <span class="option-name">エントランスアシストステップ (O1043)</span>
-                                <span class="option-weight">+5kg (F: -2, R: 7)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="-3" data-rear="13" data-total="10">
-                            <div class="option-content">
-                                <span class="option-name">ラップル (P3202)</span>
-                                <span class="option-weight">+10kg (F: -3, R: 13)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O3012" data-front="-3" data-rear="33" data-total="30">
-                            <div class="option-content">
-                                <span class="option-name">温水設備 (O3012)</span>
-                                <span class="option-weight">+30kg (F: -3, R: 33)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="-3" data-rear="28" data-total="25">
-                            <div class="option-content">
-                                <span class="option-name">電気冷蔵庫83L (O4501)</span>
-                                <span class="option-weight">+25kg (F: -3, R: 28)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="15.5" data-total="13.5">
-                            <div class="option-content">
-                                <span class="option-name">電子レンジ (O4052)</span>
-                                <span class="option-weight">+13.5kg (F: -2, R: 15.5)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O4800" data-front="20" data-rear="10" data-total="30">
-                            <div class="option-content">
-                                <span class="option-name">リチウムイオンバッテリー追加(1個) (O4800)</span>
-                                <span class="option-weight">+30kg (F: 20, R: 10)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O4801" data-front="40" data-rear="20" data-total="60">
-                            <div class="option-content">
-                                <span class="option-name">リチウムイオンバッテリー追加(2個) (O4801)</span>
-                                <span class="option-weight">+60kg (F: 40, R: 20)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O4601" data-front="9" data-rear="1" data-total="10">
-                            <div class="option-content">
-                                <span class="option-name">フレキシブルソーラー充電器 (240W) (O4601)</span>
-                                <span class="option-weight">+10kg (F: 9, R: 1)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_O4600" data-front="14" data-rear="1" data-total="15">
-                            <div class="option-content">
-                                <span class="option-name">フレキシブルソーラー充電器 (480W) (O4600)</span>
-                                <span class="option-weight">+15kg (F: 14, R: 1)</span>
-                            </div>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" data-front="-2" data-rear="17" data-total="15">
-                            <div class="option-content">
-                                <span class="option-name">フレキシブルソーラー充電器 (610W) (O4700)</span>
-                                <span class="option-weight">+15kg (F: -2, R: 17)</span>
-                            </div>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="optionsContainer"></div>
                 </div>
 
                 <!-- Fluids & Water -->
                 <div class="card glass">
                     <h2><span class="icon">💧</span> 水タンク</h2>
-                    <div class="options-grid" style="margin-bottom: 1.5rem;">
-                        <label class="option-item">
-                            <input type="checkbox" class="option-checkbox" id="opt_WaterTank" data-front="7" data-rear="48" data-total="55" checked>
-                            <div class="option-content">
-                                <span class="option-name">生活用水タンク</span>
-                                <span class="option-weight">+55kg (F: 7, R: 48)</span>
-                            </div>
-                        </label>
-
-                        <label class="option-item disabled">
-                            <input type="checkbox" class="option-checkbox" data-standard="true" data-front="-2" data-rear="22" data-total="20" checked disabled>
-                            <div class="option-content">
-                                <span class="option-name">清水タンク</span>
-                                <span class="option-weight">+20kg (F: -2, R: 22)</span>
-                            </div>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="waterContainer" style="margin-bottom: 1.5rem;"></div>
                 </div>
 
                 <!-- Vehicle Settings -->

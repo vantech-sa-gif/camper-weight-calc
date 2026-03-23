@@ -1,13 +1,14 @@
 /**
  * V-CAL script.js
  * Clean Architecture Refactor
- * 
+ *
  * 1. Constants: Elimination of magic numbers
- * 2. Registry: Centralized DOM management
- * 3. State: Reactive UI data handling
- * 4. Calculator: Pure logic for weight computation
- * 5. PolicyManager: Style & exclusivity rules
- * 6. Renderer: Decoupled UI updates
+ * 2. Options: Centralized option data (generates HTML)
+ * 3. Registry: Centralized DOM management
+ * 4. State: Reactive UI data handling
+ * 5. Calculator: Pure logic for weight computation
+ * 6. PolicyManager: Style & exclusivity rules
+ * 7. Renderer: Decoupled UI updates
  */
 
 const CONSTANTS = {
@@ -23,12 +24,33 @@ const CONSTANTS = {
     WARNING_THRESHOLD_KG: 50
 };
 
+// オプションデータ定義 — ここを編集するだけでオプションの追加・変更が可能
+const OPTIONS = [
+    { id: 'O1026', name: 'サイドオーニング3.5m',              code: 'O1026', front: 4,   rear: 19,   total: 23   },
+    { id: 'O1404', name: 'ルーフウィンドウ',                  code: 'O1404', front: 5,   rear: 0,    total: 5    },
+    { id: 'O1043', name: 'エントランスアシストステップ',        code: 'O1043', front: -2,  rear: 7,    total: 5    },
+    { id: 'P3202', name: 'ラップル',                          code: 'P3202', front: -3,  rear: 13,   total: 10   },
+    { id: 'O3012', name: '温水設備',                          code: 'O3012', front: -3,  rear: 33,   total: 30   },
+    { id: 'O4501', name: '電気冷蔵庫83L',                     code: 'O4501', front: -3,  rear: 28,   total: 25   },
+    { id: 'O4052', name: '電子レンジ',                        code: 'O4052', front: -2,  rear: 15.5, total: 13.5 },
+    { id: 'O4800', name: 'リチウムイオンバッテリー追加(1個)',   code: 'O4800', front: 20,  rear: 10,   total: 30   },
+    { id: 'O4801', name: 'リチウムイオンバッテリー追加(2個)',   code: 'O4801', front: 40,  rear: 20,   total: 60   },
+    { id: 'O4601', name: 'フレキシブルソーラー充電器 (240W)',   code: 'O4601', front: 9,   rear: 1,    total: 10   },
+    { id: 'O4600', name: 'フレキシブルソーラー充電器 (480W)',   code: 'O4600', front: 14,  rear: 1,    total: 15   },
+    { id: 'O4700', name: 'フレキシブルソーラー充電器 (610W)',   code: 'O4700', front: -2,  rear: 17,   total: 15   },
+];
+
+const WATER_OPTIONS = [
+    { id: 'WaterTank', name: '生活用水タンク', front: 7,  rear: 48, total: 55, defaultChecked: true, category: 'water'     },
+    { id: 'FreshWater', name: '清水タンク',    front: -2, rear: 22, total: 20, defaultChecked: true, category: 'freshWater', standard: true },
+];
+
 const APP_CONFIG = {
     STYLES: {
-        'custom': { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
-        'family': { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
-        'wmax': { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true } },
-        'emax': { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
+        'custom':  { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
+        'family':  { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
+        'wmax':    { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true } },
+        'emax':    { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
         'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
     },
     EXCLUSIVITY: [
@@ -106,7 +128,7 @@ class AppState {
 class WeightCalculator {
     static calculate(state, baseWeights, optionData) {
         const { passengers, passFrontSub, passRearSub } = this._getPaxData(state.paxCount);
-        
+
         let waterTotal = 0;
         let optionsTotal = 0;
         let additionalBaseWeight = 0;
@@ -251,7 +273,7 @@ class PolicyManager {
 class Renderer {
     static update(results, limits, registry) {
         const { outputs, totalWeightContainer } = registry;
-        
+
         // Main Displays
         outputs.totalWeight.innerText = Math.round(results.grandTotal);
         outputs.gvwr.innerText = Math.round(limits.gvwr);
@@ -304,7 +326,7 @@ class Renderer {
     static _updateStatusLabel(valueEl, labelEl, containerEl, weightContainer, barEl, total, gvwr) {
         if (!valueEl || !labelEl || !containerEl || !weightContainer || !barEl) return;
         const remaining = gvwr - total;
-        
+
         weightContainer.className = 'current-weight';
         barEl.className = 'progress-bar';
         containerEl.className = 'remaining-display';
@@ -329,8 +351,32 @@ class Renderer {
 }
 
 class App {
+    // オプションデータからチェックボックスUIを生成する
+    static _buildOptions(container, opts) {
+        if (!container) return;
+        opts.forEach(opt => {
+            const optId = 'opt_' + opt.id;
+            const label = document.createElement('label');
+            label.className = 'option-item' + (opt.standard ? ' disabled' : '');
+            label.innerHTML =
+                `<input type="checkbox" class="option-checkbox" id="${optId}"` +
+                ` data-front="${opt.front}" data-rear="${opt.rear}" data-total="${opt.total}"` +
+                (opt.standard ? ' data-standard="true" checked disabled' : '') +
+                (opt.defaultChecked && !opt.standard ? ' checked' : '') +
+                `><div class="option-content">` +
+                `<span class="option-name">${opt.name}${opt.code ? ` (${opt.code})` : ''}</span>` +
+                `<span class="option-weight">+${opt.total}kg (F: ${opt.front}, R: ${opt.rear})</span>` +
+                `</div>`;
+            container.appendChild(label);
+        });
+    }
+
     constructor() {
         try {
+            // DOMRegistry の前にHTMLを生成する
+            App._buildOptions(document.getElementById('optionsContainer'), OPTIONS);
+            App._buildOptions(document.getElementById('waterContainer'), WATER_OPTIONS);
+
             this.registry = new DOMRegistry();
             this.state = new AppState(() => this.calculate());
             this.calcTimeout = null;
@@ -401,10 +447,7 @@ class App {
     _getCurrentlyCheckedOptionIds() {
         const ids = new Set();
         this.registry.inputs.options.forEach(cb => {
-            if (cb.checked) {
-                const id = cb.id || cb.closest('.option-item').querySelector('.option-name').innerText;
-                ids.add(id);
-            }
+            if (cb.checked) ids.add(cb.id);
         });
         return ids;
     }
@@ -431,17 +474,16 @@ class App {
         }, 100);
     }
 
+    // オプションデータをDOMではなくデータ配列から直接構築
     _getOptionDataMap() {
         const map = {};
-        this.registry.inputs.options.forEach(cb => {
-            const item = cb.closest('.option-item');
-            const id = cb.id || item.querySelector('.option-name').innerText;
-            map[id] = {
-                front: parseFloat(cb.dataset.front) || 0,
-                rear: parseFloat(cb.dataset.rear) || 0,
-                total: parseFloat(cb.dataset.total) || 0,
-                isFreshWater: item.innerText.includes('清水タンク'),
-                isWater: cb.id === 'opt_WaterTank'
+        [...OPTIONS, ...WATER_OPTIONS].forEach(opt => {
+            map['opt_' + opt.id] = {
+                front: opt.front,
+                rear: opt.rear,
+                total: opt.total,
+                isFreshWater: opt.category === 'freshWater',
+                isWater: opt.category === 'water'
             };
         });
         return map;
