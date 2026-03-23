@@ -27,7 +27,7 @@ const APP_CONFIG = {
     STYLES: {
         'custom': { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
         'family': { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
-        'wmax': { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true }, locks: ['opt_O4801'] },
+        'wmax': { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true } },
         'emax': { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
         'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
     },
@@ -37,6 +37,7 @@ const APP_CONFIG = {
         { group: ['opt_O1404'], excludes: ['opt_O4600'] },               // ルーフウィンドウ → 480Wのみ
         { group: ['opt_O4800'], excludes: ['opt_O4801'] },
         { group: ['opt_O4801'], excludes: ['opt_O4800'] },
+        { group: ['opt_O3012'], excludes: ['opt_O4801'], styleOnly: ['wmax'] },  // W-max: 温水設備 → バッテリー2個を排他
         { group: ['opt_O3012'], requires: ['opt_WaterTank'], forceCheck: true }
     ]
 };
@@ -209,6 +210,7 @@ class PolicyManager {
         };
 
         APP_CONFIG.EXCLUSIVITY.forEach(rule => {
+            if (rule.styleOnly && !rule.styleOnly.includes(styleId)) return;
             const isGroupChecked = rule.group.some(id => document.getElementById(id)?.checked);
 
             if (isGroupChecked) {
