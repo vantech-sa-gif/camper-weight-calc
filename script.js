@@ -32,7 +32,9 @@ const APP_CONFIG = {
         'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
     },
     EXCLUSIVITY: [
-        { group: ['opt_O4600'], excludes: ['opt_O4601', 'opt_O1404'] },
+        { group: ['opt_O4600'], excludes: ['opt_O4601', 'opt_O1404'] },  // 480W → 240W, ルーフウィンドウ
+        { group: ['opt_O4601'], excludes: ['opt_O4600'] },               // 240W → 480Wのみ
+        { group: ['opt_O1404'], excludes: ['opt_O4600'] },               // ルーフウィンドウ → 480Wのみ
         { group: ['opt_O4800'], excludes: ['opt_O4801'] },
         { group: ['opt_O4801'], excludes: ['opt_O4800'] },
         { group: ['opt_O3012'], requires: ['opt_WaterTank'], forceCheck: true }
@@ -191,6 +193,16 @@ class PolicyManager {
     }
 
     static applyExclusivity() {
+        // まず全オプションをリセット（スタイルロック・標準装備は除く）
+        const styleId = document.querySelector('input[name="camper_style"]:checked')?.value || 'custom';
+        const styleLocks = APP_CONFIG.STYLES[styleId]?.locks || [];
+        document.querySelectorAll('.option-checkbox').forEach(el => {
+            if (el.dataset.standard === 'true') return;
+            if (styleLocks.includes(el.id)) return;
+            el.disabled = false;
+            el.parentElement.classList.remove('disabled');
+        });
+
         const disableOpt = (el) => {
             el.disabled = true;
             el.parentElement.classList.add('disabled');
@@ -198,7 +210,7 @@ class PolicyManager {
 
         APP_CONFIG.EXCLUSIVITY.forEach(rule => {
             const isGroupChecked = rule.group.some(id => document.getElementById(id)?.checked);
-            
+
             if (isGroupChecked) {
                 if (rule.excludes) {
                     rule.excludes.forEach(targetId => {
