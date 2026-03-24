@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 キャンピングカー（Leaves3）の車両総重量・軸重を計算するWebアプリ。
-GitHub Pagesでホスティング。フレームワークなし（HTML + CSS + JavaScript）。
+Cloudflare Pagesでホスティング。フレームワークなし（HTML + CSS + JavaScript）。
 
 ## ファイル構成
 - `index.html` — UI骨格（オプションはscript.jsから自動生成）
