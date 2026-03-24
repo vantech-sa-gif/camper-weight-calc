@@ -21,7 +21,7 @@
                 <!-- Style Select -->
                 <div class="card glass">
                     <h2><span class="icon">✨</span> スタイル選択</h2>
-                    <div class="input-group" style="margin-bottom: 0;">
+                    <div class="input-group no-bottom-margin">
                         <div class="tab-selector" id="styleSelector">
                             <input type="radio" id="style_custom" name="camper_style" value="custom" checked>
                             <label for="style_custom">フリー</label>
@@ -59,9 +59,9 @@
 
                 <!-- Options -->
                 <div class="card glass">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
-                        <h2 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"><span class="icon">🛠️</span> オプション</h2>
-                        <button id="clearOptionsBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--accent-red); background: rgba(239, 68, 68, 0.1); color: var(--accent-red); cursor: pointer; transition: all 0.2s;">全選択解除</button>
+                    <div class="options-card-header">
+                        <h2><span class="icon">🛠️</span> オプション</h2>
+                        <button id="clearOptionsBtn">全選択解除</button>
                     </div>
                     <div class="options-grid" id="optionsContainer"></div>
                 </div>
@@ -69,7 +69,7 @@
                 <!-- Fluids & Water -->
                 <div class="card glass">
                     <h2><span class="icon">💧</span> 水タンク</h2>
-                    <div class="options-grid" id="waterContainer" style="margin-bottom: 1.5rem;"></div>
+                    <div class="options-grid" id="waterContainer"></div>
                 </div>
 
                 <!-- Vehicle Settings -->
@@ -78,32 +78,32 @@
                     <div class="input-row">
                         <div class="input-group half">
                             <label for="baseFrontWeight" title="前軸重">ベース車 前軸重 (kg)</label>
-                            <input type="number" id="baseFrontWeight" value="1525" min="0" step="5" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                            <input type="number" id="baseFrontWeight" value="1525" min="0" step="5" readonly disabled class="readonly-input">
                         </div>
                         <div class="input-group half">
                             <label for="baseRearWeight" title="後軸重">ベース車 後軸重 (kg)</label>
-                            <input type="number" id="baseRearWeight" value="1535" min="0" step="5" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                            <input type="number" id="baseRearWeight" value="1535" min="0" step="5" readonly disabled class="readonly-input">
                         </div>
                     </div>
                     <div class="input-row">
                         <div class="input-group half">
                             <label for="frontGawr">前軸許容荷重 (kg)</label>
-                            <input type="number" id="frontGawr" value="1900" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                            <input type="number" id="frontGawr" value="1900" min="0" step="10" readonly disabled class="readonly-input">
                         </div>
                         <div class="input-group half">
                             <label for="rearGawr">後軸許容荷重 (kg)</label>
-                            <input type="number" id="rearGawr" value="2300" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                            <input type="number" id="rearGawr" value="2300" min="0" step="10" readonly disabled class="readonly-input">
                         </div>
                     </div>
                     <div class="input-group">
                         <label for="gvwr">許容車両総重量・GVWR (kg)</label>
-                        <input type="number" id="gvwr" value="3490" min="0" step="10" readonly disabled style="background: rgba(226, 232, 240, 0.5); color: var(--text-secondary); cursor: not-allowed;">
+                        <input type="number" id="gvwr" value="3490" min="0" step="10" readonly disabled class="readonly-input">
                     </div>
                 </div>
 
             </section>
 
-            <section class="summary-section sticky" style="align-self: start; top: 2rem;">
+            <section class="summary-section sticky">
                 <div class="summary-card glass">
                     <h2>車両総重量</h2>
                     

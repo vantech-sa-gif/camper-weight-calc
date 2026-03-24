@@ -547,6 +547,51 @@ input[type="number"]:focus, select:focus {
     }
 }
 
+/* === Migrated from inline styles === */
+.options-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.options-card-header h2 {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#clearOptionsBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--accent-red);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#waterContainer {
+    margin-bottom: 1.5rem;
+}
+
+.readonly-input {
+    background: rgba(226, 232, 240, 0.5);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.summary-section {
+    align-self: start;
+}
+
+.no-bottom-margin {
+    margin-bottom: 0;
+}
+
 @media (max-width: 500px) {
     .input-row {
         flex-direction: column;
