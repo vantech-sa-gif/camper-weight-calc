@@ -341,10 +341,10 @@ class Renderer {
             weightContainer.classList.add('warning');
             barEl.classList.add('warning');
             containerEl.classList.add('warning');
-            labelEl.innerText = '許容限度まで: ';
+            labelEl.innerText = '最大許容まで:';
             valueEl.innerText = Math.round(remaining);
         } else {
-            labelEl.innerText = '許容限度まで: ';
+            labelEl.innerText = '最大許容まで:';
             valueEl.innerText = Math.round(remaining);
         }
     }
