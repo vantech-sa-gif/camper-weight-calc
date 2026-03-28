@@ -639,4 +639,11 @@ input[type="number"]:focus, select:focus {
     .sticky {
         position: static;
     }
+
+    /* ゲージの進捗バーに直接指定（*セレクタでは効かないブラウザ対策） */
+    .progress-bar,
+    .progress-bar-container {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
