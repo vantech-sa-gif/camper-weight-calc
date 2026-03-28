@@ -603,3 +603,40 @@ input[type="number"]:focus, select:focus {
         gap: 0;
     }
 }
+
+@media print {
+    /* 背景色・グラデーションを印刷時に保持（ゲージの色を表示するために必須） */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* 印刷不要な要素を非表示 */
+    .background-mesh,
+    #clearOptionsBtn {
+        display: none;
+    }
+
+    /* ヘッダーのコンポジットレイヤー設定をリセット（ロゴ・バージョン消え対策） */
+    header {
+        transform: none;
+        will-change: auto;
+        backface-visibility: visible;
+    }
+
+    /* ホバー・アニメーション効果を無効化 */
+    .glass {
+        box-shadow: none;
+        transition: none;
+    }
+
+    .glass:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* stickyを解除してページ送りを正常化 */
+    .sticky {
+        position: static;
+    }
+}
