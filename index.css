@@ -276,6 +276,11 @@ input[type="number"]:focus, select:focus {
     transform: none;
 }
 
+.summary-card.danger {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 8px 2px rgba(255, 0, 0, 0.4), 0 0 24px 6px rgba(255, 0, 0, 0.2);
+}
+
 .total-display {
     text-align: center;
     margin: 1.5rem 0;

@@ -330,11 +330,14 @@ class Renderer {
         weightContainer.className = 'current-weight';
         barEl.className = 'progress-bar';
         containerEl.className = 'remaining-display';
+        const summaryCard = weightContainer.closest('.summary-card');
+        if (summaryCard) summaryCard.className = 'summary-card glass';
 
         if (remaining < 0) {
             weightContainer.classList.add('danger');
             barEl.classList.add('danger');
             containerEl.classList.add('danger');
+            if (summaryCard) summaryCard.classList.add('danger');
             labelEl.innerText = 'オーバー: ';
             valueEl.innerText = Math.abs(Math.round(remaining));
         } else if (remaining <= CONSTANTS.WARNING_THRESHOLD_KG) {
