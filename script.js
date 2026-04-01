@@ -48,7 +48,7 @@ const WATER_OPTIONS = [
 const APP_CONFIG = {
     STYLES: {
         'custom':  { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
-        'family':  { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
+        'family':  { defaultPax: 6, defaults: { 'opt_WaterTank': true, 'opt_O3012': true, 'opt_O4801': true } },
         'wmax':    { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true } },
         'emax':    { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
         'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
