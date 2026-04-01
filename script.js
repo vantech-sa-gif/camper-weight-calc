@@ -107,7 +107,7 @@ class DOMRegistry {
 
 class AppState {
     constructor(onChange) {
-        this.style = 'custom';
+        this.style = 'family';
         this.paxCount = 6;
         this.selectedOptions = new Set();
         this.onChange = onChange;
@@ -217,7 +217,7 @@ class PolicyManager {
 
     static applyExclusivity() {
         // まず全オプションをリセット（スタイルロック・標準装備は除く）
-        const styleId = document.querySelector('input[name="camper_style"]:checked')?.value || 'custom';
+        const styleId = document.querySelector('input[name="camper_style"]:checked')?.value || 'family';
         const styleLocks = APP_CONFIG.STYLES[styleId]?.locks || [];
         document.querySelectorAll('.option-checkbox').forEach(el => {
             if (el.dataset.standard === 'true') return;
