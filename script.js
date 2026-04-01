@@ -48,7 +48,7 @@ const WATER_OPTIONS = [
 const APP_CONFIG = {
     STYLES: {
         'custom':  { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
-        'family':  { defaultPax: 6, defaults: { 'opt_WaterTank': true, 'opt_O3012': true, 'opt_O4801': true } },
+        'family':  { defaultPax: 6, locks: ['opt_WaterTank', 'opt_O3012', 'opt_O4801'] },
         'wmax':    { defaultPax: 4, defaults: { 'opt_WaterTank': true, 'opt_O3012': true } },
         'emax':    { defaultPax: 4, defaults: { 'opt_O4801': true }, locks: ['opt_WaterTank', 'opt_O3012'] },
         'premium': { defaultPax: 3, defaults: { 'opt_WaterTank': true } }
@@ -187,7 +187,6 @@ class PolicyManager {
             if (cb.dataset.standard !== 'true') {
                 cb.disabled = false;
                 cb.parentElement.classList.remove('disabled');
-                cb.parentElement.classList.remove('locked-default');
             }
         });
 
@@ -195,13 +194,7 @@ class PolicyManager {
         if (config.defaults) {
             Object.keys(config.defaults).forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    el.checked = config.defaults[id];
-                    if (config.defaults[id] === true) {
-                        el.disabled = true;
-                        el.parentElement.classList.add('locked-default');
-                    }
-                }
+                if (el) el.checked = config.defaults[id];
             });
         }
 
@@ -229,7 +222,6 @@ class PolicyManager {
         document.querySelectorAll('.option-checkbox').forEach(el => {
             if (el.dataset.standard === 'true') return;
             if (styleLocks.includes(el.id)) return;
-            if (el.parentElement.classList.contains('locked-default')) return;
             el.disabled = false;
             el.parentElement.classList.remove('disabled');
         });
