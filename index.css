@@ -407,6 +407,11 @@ input[type="number"]:focus, select:focus {
     box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
 
+.option-item:has(.option-checkbox:checked):not(.disabled) {
+    background: #E3F2FD;
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
 .option-checkbox {
     width: 1.2rem;
     height: 1.2rem;
@@ -507,6 +512,27 @@ input[type="number"]:focus, select:focus {
     background: rgba(226, 232, 240, 0.5);
     pointer-events: none;
     border-color: rgba(203, 213, 225, 0.3);
+}
+
+.option-item.locked-on {
+    position: relative;
+    pointer-events: none;
+    cursor: default;
+}
+
+.option-item.locked-on .option-checkbox {
+    visibility: hidden;
+}
+
+.option-item.locked-on::after {
+    content: '🔒';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    line-height: 1;
+    pointer-events: none;
 }
 
 /* New class for passenger tabs to disable interaction without changing look */

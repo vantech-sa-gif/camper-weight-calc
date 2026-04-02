@@ -185,16 +185,24 @@ class PolicyManager {
         // Reset options visibility/accessibility
         registry.inputs.options.forEach(cb => {
             if (cb.dataset.standard !== 'true') {
+                if (cb.parentElement.classList.contains('locked-on')) cb.checked = false;
                 cb.disabled = false;
-                cb.parentElement.classList.remove('disabled');
+                cb.parentElement.classList.remove('disabled', 'locked-on');
             }
         });
 
         // Set Default options
         if (config.defaults) {
+            const shouldLock = (styleId !== 'custom');
             Object.keys(config.defaults).forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.checked = config.defaults[id];
+                if (el) {
+                    el.checked = config.defaults[id];
+                    if (shouldLock) {
+                        el.disabled = true;
+                        el.parentElement.classList.add('locked-on');
+                    }
+                }
             });
         }
 
@@ -222,6 +230,7 @@ class PolicyManager {
         document.querySelectorAll('.option-checkbox').forEach(el => {
             if (el.dataset.standard === 'true') return;
             if (styleLocks.includes(el.id)) return;
+            if (el.parentElement.classList.contains('locked-on')) return;
             el.disabled = false;
             el.parentElement.classList.remove('disabled');
         });
@@ -239,7 +248,7 @@ class PolicyManager {
                 if (rule.excludes) {
                     rule.excludes.forEach(targetId => {
                         const target = document.getElementById(targetId);
-                        if (target) {
+                        if (target && !target.parentElement.classList.contains('locked-on')) {
                             target.checked = false;
                             disableOpt(target);
                         }
@@ -248,7 +257,7 @@ class PolicyManager {
                 if (rule.forceCheck) {
                     rule.requires.forEach(targetId => {
                         const target = document.getElementById(targetId);
-                        if (target) {
+                        if (target && !target.parentElement.classList.contains('locked-on')) {
                             target.checked = true;
                             disableOpt(target);
                         }
@@ -360,7 +369,7 @@ class App {
         opts.forEach(opt => {
             const optId = 'opt_' + opt.id;
             const label = document.createElement('label');
-            label.className = 'option-item' + (opt.standard ? ' disabled' : '');
+            label.className = 'option-item' + (opt.standard ? ' locked-on' : '');
             label.innerHTML =
                 `<input type="checkbox" class="option-checkbox" id="${optId}"` +
                 ` data-front="${opt.front}" data-rear="${opt.rear}" data-total="${opt.total}"` +
@@ -410,7 +419,9 @@ class App {
 
         inputs.clearOptionsBtn?.addEventListener('click', () => {
             const optionCard = inputs.clearOptionsBtn.closest('.card');
-            optionCard.querySelectorAll('.option-checkbox').forEach(cb => cb.checked = false);
+            optionCard.querySelectorAll('.option-checkbox').forEach(cb => {
+                if (!cb.disabled) cb.checked = false;
+            });
             this.syncState();
         });
     }
