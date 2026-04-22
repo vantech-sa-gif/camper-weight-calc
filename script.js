@@ -426,6 +426,7 @@ class App {
             if (!vehicle) return;
             this.state.update({ selectedVehicle: vehicleId });
             this._applyVehicleView(vehicle);
+            this.syncState(vehicle.available); // Leaves3復帰時はスタイルを再適用してアンロック
         }));
 
         inputs.styleRadios.forEach(r => r.addEventListener('change', (e) => {
@@ -453,6 +454,13 @@ class App {
         const hide = !vehicle.available;
         styleCard?.classList.toggle('card-hidden', hide);
         paxCard?.classList.toggle('card-hidden', hide);
+        const waterTankEl = document.getElementById('opt_WaterTank');
+        if (waterTankEl && hide) {
+            waterTankEl.checked = true;
+            waterTankEl.disabled = true;
+            waterTankEl.parentElement.classList.add('locked-on');
+        }
+        // アンロックは syncState(true) → applyStyle が locked-on を一括クリアして処理する
     }
 
     _initScrollEffect() {
