@@ -729,3 +729,4 @@ input[type="number"]:focus, select:focus {
     .vehicle-selector label { font-size: 0.8rem; padding: 0.4rem 0.5rem; gap: 0.25rem; }
     .coming-soon-badge { font-size: 0.6rem; padding: 0.05rem 0.3rem; }
 }
+.card-hidden { display: none; }

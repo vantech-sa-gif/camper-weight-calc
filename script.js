@@ -106,7 +106,9 @@ class DOMRegistry {
             rearRemaining: document.getElementById('rearRemaining'),
             frontBar: document.getElementById('frontProgressBar'),
             rearBar: document.getElementById('rearProgressBar'),
-            subTitle: document.querySelector('.sub-title')
+            subTitle: document.querySelector('.sub-title'),
+            styleCard: document.getElementById('styleCard'),
+            paxCard: document.getElementById('paxCard')
         };
 
         this.header = document.querySelector('header');
@@ -411,6 +413,7 @@ class App {
     init() {
         this._attachListeners();
         this._initScrollEffect();
+        this._applyVehicleView(VEHICLES.find(v => v.id === this.state.selectedVehicle));
         this.syncState(true); // Initial override & calculation
     }
 
@@ -420,9 +423,9 @@ class App {
         inputs.vehicleRadios.forEach(r => r.addEventListener('change', (e) => {
             const vehicleId = e.target.value;
             const vehicle = VEHICLES.find(v => v.id === vehicleId);
-            if (!vehicle || !vehicle.available) return;
+            if (!vehicle) return;
             this.state.update({ selectedVehicle: vehicleId });
-            this._updateSubTitle(vehicleId);
+            this._applyVehicleView(vehicle);
         }));
 
         inputs.styleRadios.forEach(r => r.addEventListener('change', (e) => {
@@ -444,11 +447,12 @@ class App {
         });
     }
 
-    _updateSubTitle(vehicleId) {
-        const vehicle = VEHICLES.find(v => v.id === vehicleId);
-        const el = this.registry.outputs.subTitle;
-        if (!vehicle || !el) return;
-        el.textContent = `For ${vehicle.name}`;
+    _applyVehicleView(vehicle) {
+        const { subTitle, styleCard, paxCard } = this.registry.outputs;
+        if (subTitle) subTitle.textContent = `For ${vehicle.name}`;
+        const hide = !vehicle.available;
+        styleCard?.classList.toggle('card-hidden', hide);
+        paxCard?.classList.toggle('card-hidden', hide);
     }
 
     _initScrollEffect() {
