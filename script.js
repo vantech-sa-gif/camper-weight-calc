@@ -45,6 +45,13 @@ const WATER_OPTIONS = [
     { id: 'FreshWater', name: '清水タンク',    front: -2, rear: 22, total: 20, defaultChecked: true, category: 'freshWater', standard: true },
 ];
 
+const VEHICLES = [
+    { id: 'leaves3', name: 'Leaves3', available: true  },
+    { id: 'leaves2', name: 'Leaves2', available: false },
+    { id: 'bunks4',  name: 'Bunks4',  available: false },
+];
+const DEFAULT_VEHICLE_ID = 'leaves3';
+
 const APP_CONFIG = {
     STYLES: {
         'custom':  { defaultPax: 6, defaults: { 'opt_WaterTank': true } },
@@ -72,6 +79,7 @@ class DOMRegistry {
             frontGawr: document.getElementById('frontGawr'),
             rearGawr: document.getElementById('rearGawr'),
             gvwr: document.getElementById('gvwr'),
+            vehicleRadios: document.querySelectorAll('input[name="vehicle_selector"]'),
             styleRadios: document.querySelectorAll('input[name="camper_style"]'),
             paxRadios: document.querySelectorAll('input[name="passengerCount"]'),
             options: document.querySelectorAll('.option-checkbox'),
@@ -97,7 +105,8 @@ class DOMRegistry {
             frontRemaining: document.getElementById('frontRemaining'),
             rearRemaining: document.getElementById('rearRemaining'),
             frontBar: document.getElementById('frontProgressBar'),
-            rearBar: document.getElementById('rearProgressBar')
+            rearBar: document.getElementById('rearProgressBar'),
+            subTitle: document.querySelector('.sub-title')
         };
 
         this.header = document.querySelector('header');
@@ -110,6 +119,7 @@ class AppState {
         this.style = 'family';
         this.paxCount = 6;
         this.selectedOptions = new Set();
+        this.selectedVehicle = DEFAULT_VEHICLE_ID;
         this.onChange = onChange;
     }
 
@@ -407,6 +417,14 @@ class App {
     _attachListeners() {
         const { inputs } = this.registry;
 
+        inputs.vehicleRadios.forEach(r => r.addEventListener('change', (e) => {
+            const vehicleId = e.target.value;
+            const vehicle = VEHICLES.find(v => v.id === vehicleId);
+            if (!vehicle || !vehicle.available) return;
+            this.state.update({ selectedVehicle: vehicleId });
+            this._updateSubTitle(vehicleId);
+        }));
+
         inputs.styleRadios.forEach(r => r.addEventListener('change', (e) => {
             this.state.style = e.target.value;
             this.syncState(true);
@@ -424,6 +442,13 @@ class App {
             });
             this.syncState();
         });
+    }
+
+    _updateSubTitle(vehicleId) {
+        const vehicle = VEHICLES.find(v => v.id === vehicleId);
+        const el = this.registry.outputs.subTitle;
+        if (!vehicle || !el) return;
+        el.textContent = `For ${vehicle.name}`;
     }
 
     _initScrollEffect() {

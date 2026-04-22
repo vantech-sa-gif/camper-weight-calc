@@ -673,3 +673,59 @@ input[type="number"]:focus, select:focus {
         print-color-adjust: exact;
     }
 }
+
+/* === 車種セレクタ（ヘッダー最上部） === */
+.vehicle-selector {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto 1.25rem;
+    background: rgba(226, 232, 240, 0.6);
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--glass-border);
+}
+.vehicle-selector input[type="radio"] { display: none; }
+.vehicle-selector label {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+.vehicle-selector input[type="radio"]:checked + label {
+    background: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.vehicle-selector input[type="radio"]:disabled + label {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.vehicle-selector input[type="radio"]:disabled + label:hover {
+    background: transparent;
+}
+.coming-soon-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.2);
+    color: var(--text-secondary);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    letter-spacing: 0.03em;
+}
+@media (max-width: 600px) {
+    .vehicle-selector { max-width: 100%; }
+    .vehicle-selector label { font-size: 0.8rem; padding: 0.4rem 0.5rem; gap: 0.25rem; }
+    .coming-soon-badge { font-size: 0.6rem; padding: 0.05rem 0.3rem; }
+}

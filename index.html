@@ -12,8 +12,18 @@
     <div class="background-mesh"></div>
     <div class="app-container">
         <header>
+            <nav class="vehicle-selector" aria-label="車種を選択">
+                <input type="radio" id="vehicle_leaves3" name="vehicle_selector" value="leaves3" checked>
+                <label for="vehicle_leaves3">Leaves3</label>
+
+                <input type="radio" id="vehicle_leaves2" name="vehicle_selector" value="leaves2" disabled>
+                <label for="vehicle_leaves2">Leaves2<span class="coming-soon-badge">準備中</span></label>
+
+                <input type="radio" id="vehicle_bunks4" name="vehicle_selector" value="bunks4" disabled>
+                <label for="vehicle_bunks4">Bunks4<span class="coming-soon-badge">準備中</span></label>
+            </nav>
             <img src="logo.png" alt="V-CAL ロゴ" class="main-logo">
-            <p><span class="version-badge">v1.21</span></p>
+            <p><span class="version-badge">v1.22</span></p>
             <p><span class="sub-title">For Leaves3</span></p>
         </header>
 
